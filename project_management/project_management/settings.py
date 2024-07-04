@@ -42,7 +42,7 @@ INSTALLED_APPS = [
     
     # third party app
     'rest_framework',
-    # 'drf-yasg',
+    'drf_yasg',
     
     # local app
     'tasks'
