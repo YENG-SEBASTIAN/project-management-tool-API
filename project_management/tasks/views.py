@@ -2,10 +2,10 @@
 
 from rest_framework import generics
 from rest_framework.permissions import IsAuthenticated
-from django.core.mail import send_mail
 from tasks.models import Project, Milestone, Task, TaskComment
 from tasks.serializers import ProjectSerializer, MilestoneSerializer, TaskSerializer, TaskCommentSerializer
 from tasks.permissions import IsProjectOwner, IsAssignee
+from tasks.utils import send_task_assignment_email
 
 class ProjectListCreateView(generics.ListCreateAPIView):
     queryset = Project.objects.all()
@@ -38,13 +38,7 @@ class TaskListCreateView(generics.ListCreateAPIView):
     def perform_create(self, serializer):
         task = serializer.save()
         if task.assignee:
-            send_mail(
-                'You have been assigned a new task',
-                f'You have been assigned to the task: {task.name}',
-                'from@example.com',
-                [task.assignee.email],
-                fail_silently=False,
-            )
+            send_task_assignment_email(task)
 
 class TaskDetailView(generics.RetrieveUpdateDestroyAPIView):
     queryset = Task.objects.all()
