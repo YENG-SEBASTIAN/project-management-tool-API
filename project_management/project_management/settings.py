@@ -12,6 +12,7 @@ https://docs.djangoproject.com/en/5.0/ref/settings/
 
 from pathlib import Path
 import os
+from datetime import timedelta
 from decouple import config
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
@@ -159,5 +160,14 @@ EMAIL_USE_TLS = config('EMAIL_USE_TLS', cast=bool)
 REST_FRAMEWORK = {
     'DEFAULT_AUTHENTICATION_CLASSES': (
         'rest_framework_simplejwt.authentication.JWTAuthentication',
+        'rest_framework.authentication.BasicAuthentication',
+        'rest_framework.authentication.SessionAuthentication',
     ),
+}
+
+
+SIMPLE_JWT = {
+    'AUTH_HEADER_TYPES' : ('Bearer', ),
+    'ACCESS_TOKEN_LIFETIME' : timedelta(minutes=100),
+    'REFRESH_TOKEN_LIFETIME' : timedelta(days=1)
 }
