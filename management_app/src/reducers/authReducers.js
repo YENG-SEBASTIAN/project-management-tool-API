@@ -1,5 +1,5 @@
-// registerReducer.js
-
+// authReducers.js
+import { combineReducers } from 'redux';
 import {
     REGISTER_REQUEST,
     REGISTER_SUCCESS,
@@ -8,22 +8,21 @@ import {
     LOGIN_SUCCESS,
     LOGIN_FAIL,
     LOGOUT
-} from '../actions/authActionTypes';
+  } from '../actions/authActionTypes';
   
-const initialRegisterState = {
+  const initialRegisterState = {
     loading: false,
     error: null
-};
-
-const initialLoginState = {
+  };
+  
+  const initialLoginState = {
     loading: false,
     error: null
-};
-
-
-export const registerReducer = (state = initialRegisterState, action) => {
+  };
+  
+  export const registerReducer = (state = initialRegisterState, action) => {
     const { type, payload } = action;
-
+  
     switch(type) {
       case REGISTER_REQUEST:
         return {
@@ -43,12 +42,10 @@ export const registerReducer = (state = initialRegisterState, action) => {
           loading: false,
           error: payload
         };
+      default:
+        return state;
     }
   };
-
-
-
-
   
   export const loginReducer = (state = initialLoginState, action) => {
     const { type, payload } = action;
@@ -73,17 +70,15 @@ export const registerReducer = (state = initialRegisterState, action) => {
           error: payload
         };
       case LOGOUT:
-        return initialState;  // Reset state on logout
+        return initialLoginState;  // Reset state on logout
       default:
         return state;
     }
   };
+  
 
-
-
-export const authenticationReducer = (state = {}, action) => {
-return {
-    login: loginReducer(state.login, action),
-    register: registerReducer(state.register, action),
-};
-  };
+  export const authenticationReducer = combineReducers({
+    register: registerReducer,
+    login: loginReducer
+  });
+  

@@ -1,7 +1,7 @@
 // store.js
 
 import { createStore, applyMiddleware, compose } from 'redux';
-import thunk from 'redux-thunk';
+import {thunk} from 'redux-thunk'; // Correct import statement for thunk middleware
 import rootReducer from './reducers';
 
 // Initial state (if any)

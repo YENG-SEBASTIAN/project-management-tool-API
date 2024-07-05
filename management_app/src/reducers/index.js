@@ -1,9 +1,10 @@
+// index.js
 
 import { combineReducers } from 'redux';
 import { authenticationReducer } from './authReducers';
 
 const rootReducer = combineReducers({
-  auth: authenticationReducer,
+  auth: authenticationReducer
 });
 
 export default rootReducer;
