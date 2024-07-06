@@ -1,4 +1,5 @@
 import React, { useState } from 'react';
+import { Navigate, useNavigate } from 'react-router-dom';
 import { useDispatch } from 'react-redux';
 import { login } from '../../actions/authActions';
 
@@ -6,6 +7,7 @@ const Login = () => {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [error, setError] = useState('');
+  const navigate = useNavigate();
 
   const dispatch = useDispatch();
 
@@ -16,6 +18,7 @@ const Login = () => {
       // Clear form fields on successful login
       setEmail('');
       setPassword('');
+      navigate('/dashboard')
     } catch (err) {
       setError(err.response.data.detail); // error message is sent from backend
     }
