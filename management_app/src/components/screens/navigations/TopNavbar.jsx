@@ -1,60 +1,55 @@
 import React, { useState } from 'react';
-import { useSelector, useDispatch } from 'react-redux';
-import { FaExpandArrowsAlt } from 'react-icons/fa';
+import { FiMenu, FiMaximize, FiUser } from 'react-icons/fi';
 import { logout } from '../../../actions/authActions';
-import { useNavigate } from 'react-router-dom';
+import { FiLogOut } from 'react-icons/fi';
 
-const TopNavbar = ({ isSidebarOpen }) => {
-  const user = useSelector((state) => state.auth.user);
-  const dispatch = useDispatch();
-  const navigate = useNavigate();
+const TopNavbar = ({ toggleSidebar }) => {
   const [isDropdownOpen, setIsDropdownOpen] = useState(false);
 
   const handleFullScreen = () => {
     if (!document.fullscreenElement) {
       document.documentElement.requestFullscreen();
-    } else {
-      if (document.exitFullscreen) {
-        document.exitFullscreen();
-      }
+    } else if (document.exitFullscreen) {
+      document.exitFullscreen();
     }
   };
 
   const handleLogout = () => {
-    dispatch(logout());
-    navigate('/');
+    console.log('Logout');
+  };
+
+  const toggleDropdown = () => {
+    setIsDropdownOpen(!isDropdownOpen);
   };
 
   return (
-    <div className={`flex justify-between items-center bg-white shadow-md p-4 fixed w-full ${isSidebarOpen ? 'md:w-[calc(100%-16rem)]' : 'w-full'} ml-${isSidebarOpen ? '' : '0'} z-10 transition-all duration-300 ease-in-out`}>
-      <div className="text-xl font-bold flex items-center">
-        Project Management Tool
-        <span className="ml-5 text-sm text-gray-600">Number of projects: 5</span>
-      </div>
-      <div className="flex items-center">
-        <button onClick={handleFullScreen} className="mr-4 hidden md:block">
-          <FaExpandArrowsAlt className="w-6 h-6 text-gray-700" />
-        </button>
-        <div className="relative">
-          <img
-            src={user?.avatar || 'https://via.placeholder.com/40'}
-            alt="Avatar"
-            className="w-10 h-10 rounded-full object-cover cursor-pointer"
-            onClick={() => setIsDropdownOpen(!isDropdownOpen)}
-          />
-          {isDropdownOpen && (
-            <div className="absolute right-0 mt-2 w-48 bg-white border rounded-lg shadow-lg py-2">
-              <button
-                onClick={handleLogout}
-                className="block w-full text-left px-4 py-2 text-red-600 hover:bg-red-100"
-              >
-                Logout
-              </button>
-            </div>
-          )}
+    <header className="bg-orange-900 text-white fixed top-0 left-0 right-0 z-50">
+      <div className="container mx-auto flex justify-between items-center py-4 px-6">
+        <div className="flex items-center">
+          <button className="mr-4 md:hidden" onClick={toggleSidebar}>
+            <FiMenu className="h-6 w-6" />
+          </button>
+          <h1 className="text-xl font-bold">Management Tool</h1>
+        </div>
+        <div className="flex items-center">
+          <button className="mr-4 text-white" onClick={handleFullScreen}>
+            <FiMaximize className="h-6 w-6" />
+          </button>
+          <div className="relative">
+            <button className="text-white focus:outline-none" onClick={toggleDropdown}>
+              <FiUser className="h-8 w-8 rounded-full" />
+            </button>
+            {isDropdownOpen && (
+              <div className="absolute right-0 mt-2 w-48 bg-white border rounded-lg shadow-lg py-2">
+                <button onClick={handleLogout} className="block justify-center items-center flex w-full text-left px-4 py-2 text-red-500 hover:bg-gray-200">
+                <FiLogOut className="h-8 w-8 rounded-full" /> Logout 
+                </button>
+              </div>
+            )}
+          </div>
         </div>
       </div>
-    </div>
+    </header>
   );
 };
 
