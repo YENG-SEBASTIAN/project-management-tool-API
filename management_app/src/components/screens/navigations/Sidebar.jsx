@@ -23,6 +23,17 @@ const Sidebar = () => {
           </li>
         </ul>
       </nav>
+      <div className="absolute bottom-0 w-full">
+        <nav className="mb-10">
+          <ul>
+            <li className="mb-4">
+              <NavLink to="/organizations" activeClassName="font-bold" className="block py-2 px-4 hover:bg-orange-600">
+                Organizations
+              </NavLink>
+            </li>
+          </ul>
+        </nav>
+      </div>
     </div>
   );
 };
