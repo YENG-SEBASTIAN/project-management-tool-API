@@ -10,7 +10,7 @@ import {
   LOGIN_SUCCESS,
   LOGIN_FAIL,
   LOGOUT
-} from '../actions/authActionTypes';
+} from '../actions/authActionTypes'; // Ensure correct import path for action types
 
 // Register User
 export const register = ({ email, password }) => async dispatch => {
@@ -46,7 +46,7 @@ export const login = ({ email, password }) => async dispatch => {
   } catch (err) {
     dispatch({
       type: LOGIN_FAIL,
-      payload: err.response.data.message  // Backend sends error message
+      payload: err.response.data.detail  // Backend sends error message
     });
   }
 };
