@@ -26,7 +26,7 @@ const TopNavbar = ({ isSidebarOpen }) => {
   };
 
   return (
-    <div className={`flex justify-between items-center bg-white shadow-md p-4 fixed w-full ${isSidebarOpen ? 'md:w-[calc(100%-16rem)]' : 'w-full'} ml-${isSidebarOpen ? '64' : '0'} z-10 transition-all duration-300 ease-in-out`}>
+    <div className={`flex justify-between items-center bg-white shadow-md p-4 fixed w-full ${isSidebarOpen ? 'md:w-[calc(100%-16rem)]' : 'w-full'} ml-${isSidebarOpen ? '' : '0'} z-10 transition-all duration-300 ease-in-out`}>
       <div className="text-xl font-bold flex items-center">
         Project Management Tool
         <span className="ml-5 text-sm text-gray-600">Number of projects: 5</span>

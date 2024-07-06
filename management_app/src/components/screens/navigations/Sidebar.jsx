@@ -1,6 +1,6 @@
 import React from 'react';
 import { NavLink } from 'react-router-dom';
-import { FaBars, FaTimes } from 'react-icons/fa';
+import { FaBars, FaTimes, FaProjectDiagram, FaFlag, FaTasks, FaBuilding } from 'react-icons/fa';
 
 const Sidebar = ({ isOpen, toggleSidebar }) => {
   return (
@@ -12,17 +12,20 @@ const Sidebar = ({ isOpen, toggleSidebar }) => {
         <nav className="mt-10">
           <ul>
             <li className="mb-4">
-              <NavLink to="/dashboard/projects" className="block py-2 px-4 hover:bg-orange-600">
+              <NavLink to="/dashboard/projects" className="flex items-center py-2 px-4 hover:bg-orange-600">
+                <FaProjectDiagram className="mr-2" />
                 Projects
               </NavLink>
             </li>
             <li className="mb-4">
-              <NavLink to="/dashboard/milestones" className="block py-2 px-4 hover:bg-orange-600">
+              <NavLink to="/dashboard/milestones" className="flex items-center py-2 px-4 hover:bg-orange-600">
+                <FaFlag className="mr-2" />
                 Milestones
               </NavLink>
             </li>
             <li className="mb-4">
-              <NavLink to="/dashboard/tasks" className="block py-2 px-4 hover:bg-orange-600">
+              <NavLink to="/dashboard/tasks" className="flex items-center py-2 px-4 hover:bg-orange-600">
+                <FaTasks className="mr-2" />
                 Tasks
               </NavLink>
             </li>
@@ -32,7 +35,8 @@ const Sidebar = ({ isOpen, toggleSidebar }) => {
           <nav className="mb-10">
             <ul>
               <li className="mb-4">
-                <NavLink to="/dashboard/organizations" className="block py-2 px-4 hover:bg-orange-600">
+                <NavLink to="/dashboard/organizations" className="flex items-center py-2 px-4 hover:bg-orange-600">
+                  <FaBuilding className="mr-2" />
                   Organizations
                 </NavLink>
               </li>

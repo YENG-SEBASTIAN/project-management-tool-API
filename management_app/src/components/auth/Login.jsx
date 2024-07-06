@@ -4,6 +4,7 @@ import { useDispatch } from 'react-redux';
 import { login } from '../../actions/authActions';
 import { FaEye, FaEyeSlash } from 'react-icons/fa';
 import { ClipLoader } from 'react-spinners';
+import withAuthRedirect from './withAuthRedirect';
 
 const Login = () => {
   const [email, setEmail] = useState('');
@@ -122,4 +123,4 @@ const Login = () => {
   );
 };
 
-export default Login;
+export default withAuthRedirect(Login);
