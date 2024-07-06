@@ -17,37 +17,36 @@ export const register = ({ email, password }) => async dispatch => {
   dispatch({ type: REGISTER_REQUEST });
 
   try {
-    const res = await axios.post(`${base_url}/accounts/register/`, { email, password });
+    const response = await axios.post(`${base_url}/accounts/register/`, { email, password });
     dispatch({
       type: REGISTER_SUCCESS,
-      payload: res.data  // Backend sends back user data and token
+      payload: response.data  // Backend sends back user data and token
     });
-  } catch (err) {
+  } catch (error) {
+    console.log("Sabs print", error.response.data.detail)
     dispatch({
       type: REGISTER_FAIL,
-      payload: err.response.data.message  // Backend sends error message
+      payload: error.response.data.message  // Backend sends error message
     });
   }
 };
 
 // Login User
-export const login = ({ email, password }) => async dispatch => {
+export const login = ({ email, password }) => async (dispatch) => {
   dispatch({ type: LOGIN_REQUEST });
-
   try {
-    const res = await axios.post(`${base_url}/accounts/login/`, { email, password });
+    const response = await axios.post(`${base_url}/accounts/login/`, { email, password });
     dispatch({
       type: LOGIN_SUCCESS,
-      payload: res.data  // Backend sends back user data and token
+      payload: response.data,
     });
-
-    // Save token to localStorage
-    localStorage.setItem('token', res.data.access);
-  } catch (err) {
+    return response.data; // return access token
+  } catch (error) {
     dispatch({
       type: LOGIN_FAIL,
-      payload: err.response.data.detail  // Backend sends error message
+      payload: error.response.data,
     });
+    throw error;
   }
 };
 
