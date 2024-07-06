@@ -3,6 +3,7 @@ import { useNavigate, Link } from 'react-router-dom';
 import { useDispatch } from 'react-redux';
 import { register } from '../../actions/authActions';
 import { EyeIcon, EyeSlashIcon } from '@heroicons/react/24/solid';
+import ClipLoader from 'react-spinners/ClipLoader';
 
 const Register = () => {
   const [email, setEmail] = useState('');
@@ -10,26 +11,52 @@ const Register = () => {
   const [confirmPassword, setConfirmPassword] = useState('');
   const [showPassword, setShowPassword] = useState(false);
   const [error, setError] = useState('');
+  const [loading, setLoading] = useState(false);
   const navigate = useNavigate();
   const dispatch = useDispatch();
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-    if (password !== confirmPassword) {
-      setError("Passwords do not match");
+  
+    // email validation using regex
+    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+    if (!emailRegex.test(email)) {
+      setError('Please enter a valid email address');
+      setTimeout(() => setError(''), 5000);
       return;
     }
-
+  
+    // Password validation with regex
+    const passwordRegex = /^(?=.*\d)(?=.*[a-z])(?=.*[A-Z])(?=.*[a-zA-Z]).{8,}$/;
+    if (!passwordRegex.test(password)) {
+      setError('Password must be at least 8 characters long and contain at least one numeric digit, one uppercase, and one lowercase letter');
+      setTimeout(() => setError(''), 5000);
+      return;
+    }
+  
+    if (password !== confirmPassword) {
+      setError('Passwords do not match');
+      setTimeout(() => setError(''), 5000);
+      return;
+    }
+  
+    setError('');
+    setLoading(true);
+  
     try {
       await dispatch(register({ email, password }));
+      setLoading(false);
       setEmail('');
       setPassword('');
       setConfirmPassword('');
-      navigate('/');
+      navigate('/'); // Redirect to login page after successful registration
     } catch (err) {
-      setError(err.response?.data?.detail || 'Registration failed');
+      setLoading(false);
+      setError(err.response?.data?.email[0] || err.response?.data?.detail[0] || 'Registration failed');
+      setTimeout(() => setError(''), 5000);
     }
   };
+  
 
   const togglePasswordVisibility = () => {
     setShowPassword(!showPassword);
@@ -101,8 +128,10 @@ const Register = () => {
           <div className="flex items-center justify-center mb-4">
             <button
               type="submit"
-              className="bg-orange-500 hover:bg-orange-600 text-white font-bold py-2 px-4 rounded focus:outline-none focus:shadow-outline"
+              className="bg-orange-500 hover:bg-orange-600 text-white font-bold py-2 px-4 rounded focus:outline-none focus:shadow-outline flex items-center"
+              disabled={loading}
             >
+              {loading && <ClipLoader color="white" size={20} className="mr-2" />}
               Register
             </button>
           </div>

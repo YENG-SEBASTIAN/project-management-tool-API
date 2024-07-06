@@ -23,11 +23,11 @@ const ProtectedRoute = ({ children }) => {
   });
 
   useEffect(() => {
-    return () => {
-      // Cleanup on component unmount
-      idleTimerRef.current = null;
-    };
-  }, []);
+    // Redirect to login page if token is not available
+    if (!token) {
+      navigate('/');
+    }
+  }, [token, navigate]);
 
   return token ? children : <Navigate to="/" />;
 };

@@ -3,6 +3,7 @@ import { useNavigate, Link } from 'react-router-dom';
 import { useDispatch } from 'react-redux';
 import { login } from '../../actions/authActions';
 import { EyeIcon, EyeSlashIcon } from '@heroicons/react/24/solid';
+import { ClipLoader } from 'react-spinners';
 
 const Login = () => {
   const [email, setEmail] = useState('');
@@ -10,14 +11,15 @@ const Login = () => {
   const [showPassword, setShowPassword] = useState(false);
   const [error, setError] = useState('');
   const [successMsg, setSuccessMsg] = useState('');
+  const [loading, setLoading] = useState(false);
   const navigate = useNavigate();
   const dispatch = useDispatch();
 
   const handleSubmit = async (e) => {
     e.preventDefault();
+    setLoading(true);
     try {
       const response = await dispatch(login({ email, password }));
-
       if (response?.access) {
         setSuccessMsg('Login successful. Redirecting...');
         setEmail('');
@@ -30,11 +32,12 @@ const Login = () => {
         throw new Error('Login failed');
       }
     } catch (err) {
-      console.error('Error:', err);
       setError(err.response?.data?.detail || 'Invalid email or password');
       setTimeout(() => {
         setError('');
       }, 5000);
+    } finally {
+      setLoading(false);
     }
   };
 
@@ -98,9 +101,14 @@ const Login = () => {
           <div className="flex items-center justify-center mb-4">
             <button
               type="submit"
-              className="bg-orange-500 hover:bg-orange-600 text-white font-bold py-2 px-4 rounded focus:outline-none focus:shadow-outline"
+              className="bg-orange-500 hover:bg-orange-600 text-white font-bold py-2 px-4 rounded focus:outline-none focus:shadow-outline flex items-center"
+              disabled={loading}
             >
-              Login
+              {loading ? (
+                <ClipLoader color="#ffffff" size={24} />
+              ) : (
+                'Login'
+              )}
             </button>
           </div>
           <div className="text-center">
