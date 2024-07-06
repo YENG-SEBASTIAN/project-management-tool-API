@@ -1,12 +1,11 @@
 import React, { useState } from 'react';
 import { useSelector, useDispatch } from 'react-redux';
-import { ArrowsPointingOutIcon } from '@heroicons/react/24/solid'; // Correct icon import
-import { logout } from '../../../actions/authActions'; // Adjust the import based on your project setup
+import { FaExpandArrowsAlt } from 'react-icons/fa';
+import { logout } from '../../../actions/authActions';
 import { useNavigate } from 'react-router-dom';
 
-const TopNavbar = () => {
+const TopNavbar = ({ isSidebarOpen }) => {
   const user = useSelector((state) => state.auth.user);
-  //const projects = useSelector((state) => state.projects.items); // Assuming you have projects in your state
   const dispatch = useDispatch();
   const navigate = useNavigate();
   const [isDropdownOpen, setIsDropdownOpen] = useState(false);
@@ -27,14 +26,14 @@ const TopNavbar = () => {
   };
 
   return (
-    <div className="flex justify-between items-center bg-white shadow-md p-4 fixed w-[calc(100%-16rem)] ml-64 z-10">
+    <div className={`flex justify-between items-center bg-white shadow-md p-4 fixed w-full ${isSidebarOpen ? 'md:w-[calc(100%-16rem)]' : 'w-full'} ml-${isSidebarOpen ? '64' : '0'} z-10 transition-all duration-300 ease-in-out`}>
       <div className="text-xl font-bold flex items-center">
         Project Management Tool
         <span className="ml-5 text-sm text-gray-600">Number of projects: 5</span>
       </div>
       <div className="flex items-center">
-        <button onClick={handleFullScreen} className="mr-4">
-          <ArrowsPointingOutIcon className="w-6 h-6 text-gray-700" />
+        <button onClick={handleFullScreen} className="mr-4 hidden md:block">
+          <FaExpandArrowsAlt className="w-6 h-6 text-gray-700" />
         </button>
         <div className="relative">
           <img

@@ -2,7 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { useNavigate, Link } from 'react-router-dom';
 import { useDispatch } from 'react-redux';
 import { login } from '../../actions/authActions';
-import { EyeIcon, EyeSlashIcon } from '@heroicons/react/24/solid';
+import { FaEye, FaEyeSlash } from 'react-icons/fa';
 import { ClipLoader } from 'react-spinners';
 
 const Login = () => {
@@ -95,7 +95,7 @@ const Login = () => {
               onClick={togglePasswordVisibility}
               className="absolute inset-y-0 mt-5 right-0 pr-3 flex items-center text-gray-600"
             >
-              {showPassword ? <EyeSlashIcon className="h-5 w-5" /> : <EyeIcon className="h-5 w-5" />}
+              {showPassword ? <FaEyeSlash className="h-5 w-5" /> : <FaEye className="h-5 w-5" />}
             </button>
           </div>
           <div className="flex items-center justify-center mb-4">

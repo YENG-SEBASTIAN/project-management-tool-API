@@ -1,40 +1,46 @@
 import React from 'react';
 import { NavLink } from 'react-router-dom';
+import { FaBars, FaTimes } from 'react-icons/fa';
 
-const Sidebar = () => {
+const Sidebar = ({ isOpen, toggleSidebar }) => {
   return (
-    <div className="bg-orange-500 min-h-screen w-64 text-white fixed">
-      <nav className="mt-10">
-        <ul>
-          <li className="mb-4">
-            <NavLink to="/projects" activeClassName="font-bold" className="block py-2 px-4 hover:bg-orange-600">
-              Projects
-            </NavLink>
-          </li>
-          <li className="mb-4">
-            <NavLink to="/milestones" activeClassName="font-bold" className="block py-2 px-4 hover:bg-orange-600">
-              Milestones
-            </NavLink>
-          </li>
-          <li className="mb-4">
-            <NavLink to="/tasks" activeClassName="font-bold" className="block py-2 px-4 hover:bg-orange-600">
-              Tasks
-            </NavLink>
-          </li>
-        </ul>
-      </nav>
-      <div className="absolute bottom-0 w-full">
-        <nav className="mb-10">
+    <>
+      <button onClick={toggleSidebar} className="md:hidden absolute top-4 left-4 z-20">
+        {isOpen ? <FaTimes className="w-6 h-6 text-white" /> : <FaBars className="w-6 h-6 text-white" />}
+      </button>
+      <div className={`bg-orange-500 min-h-screen w-64 text-white fixed transform ${isOpen ? 'translate-x-0' : '-translate-x-full'} transition-transform duration-300 ease-in-out`}>
+        <nav className="mt-10">
           <ul>
             <li className="mb-4">
-              <NavLink to="/organizations" activeClassName="font-bold" className="block py-2 px-4 hover:bg-orange-600">
-                Organizations
+              <NavLink to="/dashboard/projects" className="block py-2 px-4 hover:bg-orange-600">
+                Projects
+              </NavLink>
+            </li>
+            <li className="mb-4">
+              <NavLink to="/dashboard/milestones" className="block py-2 px-4 hover:bg-orange-600">
+                Milestones
+              </NavLink>
+            </li>
+            <li className="mb-4">
+              <NavLink to="/dashboard/tasks" className="block py-2 px-4 hover:bg-orange-600">
+                Tasks
               </NavLink>
             </li>
           </ul>
         </nav>
+        <div className="absolute bottom-0 w-full">
+          <nav className="mb-10">
+            <ul>
+              <li className="mb-4">
+                <NavLink to="/dashboard/organizations" className="block py-2 px-4 hover:bg-orange-600">
+                  Organizations
+                </NavLink>
+              </li>
+            </ul>
+          </nav>
+        </div>
       </div>
-    </div>
+    </>
   );
 };
 
