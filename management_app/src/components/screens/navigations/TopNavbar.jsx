@@ -1,10 +1,14 @@
 import React, { useState } from 'react';
-import { FiMenu, FiMaximize, FiUser } from 'react-icons/fi';
+import { FiMenu, FiMaximize, FiUser, FiLogOut } from 'react-icons/fi';
 import { logout } from '../../../actions/authActions';
-import { FiLogOut } from 'react-icons/fi';
+import { useDispatch } from 'react-redux';
+import { useNavigate } from 'react-router-dom';
+
 
 const TopNavbar = ({ toggleSidebar }) => {
   const [isDropdownOpen, setIsDropdownOpen] = useState(false);
+  const dispatch = useDispatch();
+  const navigate = useNavigate();
 
   const handleFullScreen = () => {
     if (!document.fullscreenElement) {
@@ -15,7 +19,8 @@ const TopNavbar = ({ toggleSidebar }) => {
   };
 
   const handleLogout = () => {
-    console.log('Logout');
+    dispatch(logout());
+    return navigate('/');
   };
 
   const toggleDropdown = () => {

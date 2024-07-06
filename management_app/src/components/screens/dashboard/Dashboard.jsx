@@ -21,10 +21,10 @@ const Dashboard = () => {
         <TopNavbar toggleSidebar={toggleSidebar} />
         <div className="mt-16 p-4">
           <Routes>
-            <Route path="/dashboard/projects" element={<Project />} />
-            <Route path="/dashboard/milestones" element={<Milestone />} />
-            <Route path="/dashboard/tasks" element={<Tasks />} />
-            <Route path="/dashboard/organizations" element={<Organization />} />
+            <Route path="/projects" element={<Project />} />
+            <Route path="/milestones" element={<Milestone />} />
+            <Route path="/tasks" element={<Tasks />} />
+            <Route path="/organizations" element={<Organization />} />
           </Routes>
         </div>
       </div>

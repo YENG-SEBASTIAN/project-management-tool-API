@@ -57,7 +57,7 @@ const Login = () => {
   }, [error, successMsg]);
 
   return (
-    <div className="min-h-screen flex items-center justify-center bg-orange-500 p-4">
+    <div className="min-h-screen flex items-center justify-center bg-orange-900 p-4">
       <div className="bg-white p-8 rounded-lg shadow-lg w-full max-w-md">
         <h1 className="text-3xl font-bold mb-6 text-center">Management Tool</h1>
         <h2 className="text-2xl font-bold mb-4 text-center">Login</h2>
@@ -102,7 +102,7 @@ const Login = () => {
           <div className="flex items-center justify-center mb-4">
             <button
               type="submit"
-              className="bg-orange-500 hover:bg-orange-600 text-white font-bold py-2 px-4 rounded focus:outline-none focus:shadow-outline flex items-center"
+              className="bg-orange-600 hover:bg-orange-600 text-white font-bold py-2 px-4 rounded focus:outline-none focus:shadow-outline flex items-center"
               disabled={loading}
             >
               {loading ? (
