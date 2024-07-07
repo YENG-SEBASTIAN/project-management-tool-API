@@ -3,7 +3,7 @@ import { useDispatch, useSelector } from 'react-redux';
 import { FiPlus } from 'react-icons/fi';
 import { addProject, getProjects, deleteProject } from '../../../actions/projectActions';
 import Spinner from '../../common/Spinner';
-import Alert from '../../common/Alert'; // Import the Alert component
+import Alert from '../../common/Alert';
 
 const Project = () => {
   const dispatch = useDispatch();
