@@ -1,5 +1,3 @@
-// authActions.js
-
 import axios from 'axios';
 import { base_url } from '../constants/constant';
 import {
@@ -10,7 +8,7 @@ import {
   LOGIN_SUCCESS,
   LOGIN_FAIL,
   LOGOUT
-} from '../actions/authActionTypes'; // Ensure correct import path for action types
+} from '../actions/authActionTypes';
 
 // Register User
 export const register = ({ email, password }) => async dispatch => {
@@ -22,16 +20,16 @@ export const register = ({ email, password }) => async dispatch => {
       type: REGISTER_SUCCESS,
       payload: res.data
     });
+
     return res.data; // Return user data on successful registration
   } catch (err) {
     dispatch({
       type: REGISTER_FAIL,
-      payload: err.response.data.detail || 'Registration failed' 
+      payload: err.response.data.detail || 'Registration failed'
     });
     throw err; // Throw the error to be caught in the component
   }
 };
-
 
 // Login User
 export const login = ({ email, password }) => async dispatch => {
@@ -44,20 +42,23 @@ export const login = ({ email, password }) => async dispatch => {
       payload: res.data  // Backend sends back user data and token
     });
 
-    // Save token to localStorage
+    // Save token and user to localStorage
     localStorage.setItem('token', res.data.access);
+    localStorage.setItem('user', JSON.stringify(res.data.user));
+
     return res.data;
   } catch (err) {
-    console.log("Sabs print log", err.response.data.detail)
     dispatch({
       type: LOGIN_FAIL,
       payload: err.response.data.detail  // Backend sends error message
     });
+    throw err; // Throw the error to be caught in the component
   }
 };
 
 // Logout User
 export const logout = () => {
   localStorage.removeItem('token');
+  localStorage.removeItem('user');
   return { type: LOGOUT };
 };

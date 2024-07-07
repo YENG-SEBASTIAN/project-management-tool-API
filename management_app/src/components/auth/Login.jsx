@@ -27,7 +27,7 @@ const Login = () => {
         setPassword('');
         setTimeout(() => {
           setSuccessMsg('');
-          navigate('/dashboard');
+          navigate('/dashboard/projects');
         }, 3000);
       } else {
         throw new Error('Login failed');

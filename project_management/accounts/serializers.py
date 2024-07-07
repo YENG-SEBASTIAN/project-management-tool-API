@@ -20,3 +20,8 @@ class CustomTokenObtainPairSerializer(TokenObtainPairSerializer):
         token = super().get_token(user)
         token['email'] = user.email
         return token
+
+    def validate(self, attrs):
+        data = super().validate(attrs)
+        data['user'] = CustomUserSerializer(self.user).data
+        return data
