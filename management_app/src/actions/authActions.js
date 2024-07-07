@@ -11,11 +11,11 @@ import {
 } from '../actions/authActionTypes';
 
 // Register User
-export const register = ({ email, password }) => async dispatch => {
+export const register = ({ email, username, password }) => async dispatch => {
   dispatch({ type: REGISTER_REQUEST });
 
   try {
-    const res = await axios.post(`${base_url}/accounts/register/`, { email, password });
+    const res = await axios.post(`${base_url}/accounts/register/`, { email, username, password });
     dispatch({
       type: REGISTER_SUCCESS,
       payload: res.data

@@ -9,6 +9,7 @@ import ClipLoader from 'react-spinners/ClipLoader';
 const Register = () => {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
+  const [username, setUsername] = useState('');
   const [confirmPassword, setConfirmPassword] = useState('');
   const [showPassword, setShowPassword] = useState(false);
   const [error, setError] = useState('');
@@ -45,7 +46,7 @@ const Register = () => {
     setLoading(true);
   
     try {
-      await dispatch(register({ email, password }));
+      await dispatch(register({ email, username, password }));
       setLoading(false);
       setEmail('');
       setPassword('');
@@ -81,6 +82,20 @@ const Register = () => {
               className="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline"
               value={email}
               onChange={(e) => setEmail(e.target.value)}
+              required
+            />
+          </div>
+          <div className="mb-4">
+            <label className="block text-gray-700 text-sm font-bold mb-2" htmlFor="email">
+              Username
+            </label>
+            <input
+              type="text"
+              id="username"
+              placeholder="Enter your username"
+              className="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline"
+              value={username}
+              onChange={(e) => setUsername(e.target.value)}
               required
             />
           </div>
