@@ -6,6 +6,10 @@ export const GET_ORGANIZATIONS_REQUEST = 'GET_ORGANIZATIONS_REQUEST';
 export const GET_ORGANIZATIONS_SUCCESS = 'GET_ORGANIZATIONS_SUCCESS';
 export const GET_ORGANIZATIONS_FAIL = 'GET_ORGANIZATIONS_FAIL';
 
+export const GET_ORGANIZATION_REQUEST = 'GET_ORGANIZATION_REQUEST';
+export const GET_ORGANIZATION_SUCCESS = 'GET_ORGANIZATION_SUCCESS';
+export const GET_ORGANIZATION_FAIL = 'GET_ORGANIZATION_FAIL';
+
 export const ADD_ORGANIZATION_REQUEST = 'ADD_ORGANIZATION_REQUEST';
 export const ADD_ORGANIZATION_SUCCESS = 'ADD_ORGANIZATION_SUCCESS';
 export const ADD_ORGANIZATION_FAIL = 'ADD_ORGANIZATION_FAIL';
@@ -37,6 +41,30 @@ export const getOrganizations = () => async dispatch => {
   } catch (err) {
     dispatch({
       type: GET_ORGANIZATIONS_FAIL,
+      payload: err.response ? err.response.data.detail : 'Network Error'
+    });
+  }
+};
+
+// Get Organization by ID
+export const getOrganizationById = id => async dispatch => {
+  dispatch({ type: GET_ORGANIZATION_REQUEST });
+
+  try {
+    const token = localStorage.getItem('token');
+    const res = await axios.get(`${base_url}api/organizations/${id}/`, {
+      headers: {
+        Authorization: `Bearer ${token}`
+      }
+    });
+
+    dispatch({
+      type: GET_ORGANIZATION_SUCCESS,
+      payload: res.data
+    });
+  } catch (err) {
+    dispatch({
+      type: GET_ORGANIZATION_FAIL,
       payload: err.response ? err.response.data.detail : 'Network Error'
     });
   }
@@ -79,7 +107,7 @@ export const updateOrganization = (id, { name, description, members_emails }) =>
 
   try {
     const token = localStorage.getItem('token');
-    const res = await axios.put(
+    const res = await axios.patch( // Changed from put to patch for partial updates
       `${base_url}api/organizations/${id}/`,
       { name, description, members_emails },
       {

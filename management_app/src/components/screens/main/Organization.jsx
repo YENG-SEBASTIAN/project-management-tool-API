@@ -1,27 +1,25 @@
+// src/components/screens/main/Organization.jsx
 import React, { useEffect, useState } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
-import { FiPlus, FiTrash, FiEdit } from 'react-icons/fi';
-import { addOrganization, getOrganizations, deleteOrganization } from '../../../actions/organizationActions';
+import { useNavigate } from 'react-router-dom';
+import { FiPlus } from 'react-icons/fi';
+import { addOrganization, getOrganizations } from '../../../actions/organizationActions';
 import Spinner from '../../common/Spinner';
 import Alert from '../../common/Alert';
+import ItemList from '../../common/ItemList';
 
 const Organization = () => {
   const dispatch = useDispatch();
+  const navigate = useNavigate();
   const { organizations, loading, error } = useSelector(state => state.organizations);
 
   const [isAddModalOpen, setIsAddModalOpen] = useState(false);
-  const [isDeleteModalOpen, setIsDeleteModalOpen] = useState(false);
-  const [selectedOrganization, setSelectedOrganization] = useState(null);
   const [successMessage, setSuccessMessage] = useState('');
   const [errorMessage, setErrorMessage] = useState('');
   const [organizationName, setOrganizationName] = useState('');
   const [organizationDescription, setOrganizationDescription] = useState('');
   const [membersEmails, setMembersEmails] = useState('');
   const [user, setUser] = useState(JSON.parse(localStorage.getItem('user')).id);
-
-  const colors = [
-    'bg-red-100', 'bg-green-100', 'bg-blue-100', 'bg-yellow-100', 'bg-purple-100', 'bg-pink-100', 'bg-indigo-100'
-  ];
 
   useEffect(() => {
     dispatch(getOrganizations());
@@ -47,14 +45,8 @@ const Organization = () => {
     }
   };
 
-  const handleDeleteOrganization = async () => {
-    try {
-      await dispatch(deleteOrganization(selectedOrganization.id));
-      setSuccessMessage('Organization deleted successfully.');
-      setIsDeleteModalOpen(false);
-    } catch (err) {
-      setErrorMessage(err.response?.data?.detail || 'Failed to delete organization');
-    }
+  const handleCardClick = (organizationId) => {
+    navigate(`/dashboard/organization/${organizationId}`);
   };
 
   return (
@@ -76,29 +68,14 @@ const Organization = () => {
       {loading ? (
         <Spinner />
       ) : (
-        <div className="grid gap-4 grid-cols-1 sm:grid-cols-2 lg:grid-cols-3">
-          {organizations.map((organization, index) => (
-            <div
-              key={organization.id}
-              className={`p-4 rounded shadow cursor-pointer ${colors[index % colors.length]}`}
-            >
-              <h2 className="text-xl font-bold">{organization.name}</h2>
-              {organization.owner === user ? (
-              <div className="flex justify-between mt-2">
-                <button
-                  className="py-1 px-3 bg-red-600 text-white rounded flex items-center"
-                  onClick={() => {
-                    setSelectedOrganization(organization);
-                    setIsDeleteModalOpen(true);
-                  }}
-                >
-                  <FiTrash />
-                </button>
-              </div>
-              ): ''}
-            </div>
-          ))}
-        </div>
+        <ItemList
+          items={organizations}
+          onItemClick={handleCardClick}
+          emptyMessage="Organization list is empty. You can add one."
+          itemKey="id"
+          itemTitle="name"
+          itemDescription="description"
+        />
       )}
 
       {/* Add New Organization Modal */}
@@ -151,32 +128,6 @@ const Organization = () => {
                 </button>
               </div>
             </form>
-          </div>
-        </div>
-      )}
-
-      {/* Delete Confirmation Modal */}
-      {isDeleteModalOpen && (
-        <div className="fixed inset-0 bg-black bg-opacity-50 flex justify-center items-center z-50">
-          <div className="bg-white p-6 rounded shadow-lg w-full max-w-md">
-            <h2 className="text-xl font-bold mb-4">Confirm Deletion</h2>
-            <p>Are you sure you want to delete the organization "{selectedOrganization?.name}"?</p>
-            <div className="flex justify-end mt-4">
-              <button
-                type="button"
-                className="mr-4 py-2 px-4 bg-gray-300 rounded"
-                onClick={() => setIsDeleteModalOpen(false)}
-              >
-                Cancel
-              </button>
-              <button
-                type="button"
-                className="py-2 px-4 bg-red-600 text-white rounded"
-                onClick={handleDeleteOrganization}
-              >
-                Delete
-              </button>
-            </div>
           </div>
         </div>
       )}

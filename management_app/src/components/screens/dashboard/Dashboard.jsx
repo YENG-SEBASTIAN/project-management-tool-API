@@ -6,6 +6,7 @@ import Project from '../main/Project';
 import Milestone from '../main/Milestone';
 import Tasks from '../main/Tasks';
 import Organization from '../main/Organization';
+import OrganizationDetail from '../main/OrganizationDetail';
 
 const Dashboard = () => {
   const [isSidebarOpen, setIsSidebarOpen] = useState(false);
@@ -25,6 +26,7 @@ const Dashboard = () => {
             <Route path="/milestones" element={<Milestone />} />
             <Route path="/tasks" element={<Tasks />} />
             <Route path="/organizations" element={<Organization />} />
+            <Route path="/organization/:id" element={<OrganizationDetail />} />
           </Routes>
         </div>
       </div>
