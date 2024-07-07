@@ -1,10 +1,185 @@
-import React from 'react';
+import React, { useEffect, useState } from 'react';
+import { useDispatch, useSelector } from 'react-redux';
+import { FiPlus, FiTrash, FiEdit } from 'react-icons/fi';
+import { addOrganization, getOrganizations, deleteOrganization } from '../../../actions/organizationActions';
+import Spinner from '../../common/Spinner';
+import Alert from '../../common/Alert';
 
 const Organization = () => {
+  const dispatch = useDispatch();
+  const { organizations, loading, error } = useSelector(state => state.organizations);
+
+  const [isAddModalOpen, setIsAddModalOpen] = useState(false);
+  const [isDeleteModalOpen, setIsDeleteModalOpen] = useState(false);
+  const [selectedOrganization, setSelectedOrganization] = useState(null);
+  const [successMessage, setSuccessMessage] = useState('');
+  const [errorMessage, setErrorMessage] = useState('');
+  const [organizationName, setOrganizationName] = useState('');
+  const [organizationDescription, setOrganizationDescription] = useState('');
+  const [membersEmails, setMembersEmails] = useState('');
+  const [user, setUser] = useState(JSON.parse(localStorage.getItem('user')).id);
+
+  const colors = [
+    'bg-red-100', 'bg-green-100', 'bg-blue-100', 'bg-yellow-100', 'bg-purple-100', 'bg-pink-100', 'bg-indigo-100'
+  ];
+
+  useEffect(() => {
+    dispatch(getOrganizations());
+  }, [dispatch]);
+
+  const handleAddNewOrganization = async (e) => {
+    e.preventDefault();
+
+    try {
+      await dispatch(addOrganization({
+        name: organizationName,
+        description: organizationDescription,
+        members_emails: membersEmails.split(',').map(email => email.trim()),
+        owner: user
+      }));
+      setSuccessMessage('Organization added successfully.');
+      setOrganizationName('');
+      setOrganizationDescription('');
+      setMembersEmails('');
+      setIsAddModalOpen(false);
+    } catch (err) {
+      setErrorMessage(err.message || 'Failed to add organization');
+    }
+  };
+
+  const handleDeleteOrganization = async () => {
+    try {
+      await dispatch(deleteOrganization(selectedOrganization.id));
+      setSuccessMessage('Organization deleted successfully.');
+      setIsDeleteModalOpen(false);
+    } catch (err) {
+      setErrorMessage(err.response?.data?.detail || 'Failed to delete organization');
+    }
+  };
+
   return (
     <div className="p-4">
-      <h1 className="text-2xl font-bold mb-4">Organizations</h1>
-      <p>This is the Organizations page where you can manage your organizations.</p>
+      {error && <Alert message={error} type="error" />}
+      {successMessage && <Alert message={successMessage} type="success" />}
+      {errorMessage && <Alert message={errorMessage} type="error" />}
+
+      <div className="flex justify-between items-center mb-4">
+        <h1 className="text-2xl font-bold">Organizations</h1>
+        <button
+          className="bg-orange-600 text-white py-2 px-4 rounded flex items-center"
+          onClick={() => setIsAddModalOpen(true)}
+        >
+          <FiPlus className="mr-2" /> Add New Organization
+        </button>
+      </div>
+
+      {loading ? (
+        <Spinner />
+      ) : (
+        <div className="grid gap-4 grid-cols-1 sm:grid-cols-2 lg:grid-cols-3">
+          {organizations.map((organization, index) => (
+            <div
+              key={organization.id}
+              className={`p-4 rounded shadow cursor-pointer ${colors[index % colors.length]}`}
+            >
+              <h2 className="text-xl font-bold">{organization.name}</h2>
+              {organization.owner === user ? (
+              <div className="flex justify-between mt-2">
+                <button
+                  className="py-1 px-3 bg-red-600 text-white rounded flex items-center"
+                  onClick={() => {
+                    setSelectedOrganization(organization);
+                    setIsDeleteModalOpen(true);
+                  }}
+                >
+                  <FiTrash />
+                </button>
+              </div>
+              ): ''}
+            </div>
+          ))}
+        </div>
+      )}
+
+      {/* Add New Organization Modal */}
+      {isAddModalOpen && (
+        <div className="fixed inset-0 bg-black bg-opacity-50 flex justify-center items-center z-50">
+          <div className="bg-white p-6 rounded shadow-lg w-full max-w-md">
+            <h2 className="text-xl font-bold mb-4">Add New Organization</h2>
+            <form onSubmit={handleAddNewOrganization}>
+              <div className="mb-4">
+                <label className="block text-gray-700 mb-2">Organization Name</label>
+                <input
+                  type="text"
+                  name="organizationName"
+                  className="w-full px-3 py-2 border rounded"
+                  value={organizationName}
+                  onChange={(e) => setOrganizationName(e.target.value)}
+                  required
+                />
+              </div>
+              <div className="mb-4">
+                <label className="block text-gray-700 mb-2">Description</label>
+                <textarea
+                  name="organizationDescription"
+                  className="w-full px-3 py-2 border rounded"
+                  value={organizationDescription}
+                  onChange={(e) => setOrganizationDescription(e.target.value)}
+                  required
+                />
+              </div>
+              <div className="mb-4">
+                <label className="block text-gray-700 mb-2">Members Emails (comma separated)</label>
+                <textarea
+                  name="membersEmails"
+                  className="w-full px-3 py-2 border rounded"
+                  value={membersEmails}
+                  onChange={(e) => setMembersEmails(e.target.value)}
+                  required
+                />
+              </div>
+              <div className="flex justify-end">
+                <button
+                  type="button"
+                  className="mr-4 py-2 px-4 bg-gray-300 rounded"
+                  onClick={() => setIsAddModalOpen(false)}
+                >
+                  Cancel
+                </button>
+                <button type="submit" className="py-2 px-4 bg-orange-600 text-white rounded">
+                  Add Organization
+                </button>
+              </div>
+            </form>
+          </div>
+        </div>
+      )}
+
+      {/* Delete Confirmation Modal */}
+      {isDeleteModalOpen && (
+        <div className="fixed inset-0 bg-black bg-opacity-50 flex justify-center items-center z-50">
+          <div className="bg-white p-6 rounded shadow-lg w-full max-w-md">
+            <h2 className="text-xl font-bold mb-4">Confirm Deletion</h2>
+            <p>Are you sure you want to delete the organization "{selectedOrganization?.name}"?</p>
+            <div className="flex justify-end mt-4">
+              <button
+                type="button"
+                className="mr-4 py-2 px-4 bg-gray-300 rounded"
+                onClick={() => setIsDeleteModalOpen(false)}
+              >
+                Cancel
+              </button>
+              <button
+                type="button"
+                className="py-2 px-4 bg-red-600 text-white rounded"
+                onClick={handleDeleteOrganization}
+              >
+                Delete
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   );
 };

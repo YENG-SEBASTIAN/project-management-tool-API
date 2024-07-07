@@ -12,12 +12,8 @@ class OrganizationListCreateView(generics.ListCreateAPIView):
     permission_classes = [IsAuthenticated]
 
     def perform_create(self, serializer):
-        members_emails = self.request.data.get('members_emails', [])
-        instance = serializer.save(owner=self.request.user)
+        serializer.save(owner=self.request.user)
 
-        # Send organization member emails if provided
-        for email in members_emails:
-            send_organization_member_email(email, instance)
 
 class OrganizationDetailView(generics.RetrieveUpdateDestroyAPIView):
     queryset = Organization.objects.all()
@@ -25,12 +21,8 @@ class OrganizationDetailView(generics.RetrieveUpdateDestroyAPIView):
     permission_classes = [IsAuthenticated, IsOrganizationOwner]
 
     def perform_update(self, serializer):
-        instance = serializer.save()
+        serializer.save()
 
-        # Send organization member emails if updated
-        members_emails = self.request.data.get('members_emails', [])
-        for email in members_emails:
-            send_organization_member_email(email, instance)
 
 class ProjectListCreateView(generics.ListCreateAPIView):
     queryset = Project.objects.all()

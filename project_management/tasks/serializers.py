@@ -1,6 +1,8 @@
 from rest_framework import serializers
 from accounts.models import User
 from tasks.models import Organization, MemberEmail, Project, Milestone, Task, TaskComment, TaskLog
+from tasks.utils import send_organization_member_email
+
 
 
 class OrganizationSerializer(serializers.ModelSerializer):
@@ -29,6 +31,8 @@ class OrganizationSerializer(serializers.ModelSerializer):
         for email in members_emails:
             member_email, created = MemberEmail.objects.get_or_create(email=email)
             organization.members_emails.add(member_email)
+            # Send email to the member
+            send_organization_member_email(email, organization, self.context['request'])
 
         return organization
 
@@ -41,9 +45,10 @@ class OrganizationSerializer(serializers.ModelSerializer):
         for email in members_emails:
             member_email, created = MemberEmail.objects.get_or_create(email=email)
             organization.members_emails.add(member_email)
+            # Send email to the member
+            send_organization_member_email(email, organization, self.context['request'])
 
         return organization
-
 class ProjectSerializer(serializers.ModelSerializer):
     class Meta:
         model = Project

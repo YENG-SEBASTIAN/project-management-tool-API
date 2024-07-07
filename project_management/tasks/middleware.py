@@ -5,7 +5,6 @@ class FrontendBaseUrlMiddleware:
     def __call__(self, request):
         # Extract base URL from request headers, or construct it dynamically
         frontend_base_url = self.extract_frontend_base_url(request)
-        print("frontend_base_url", frontend_base_url)
         # Add 'frontend_base_url' to request object for use in views or serializers
         request.frontend_base_url = frontend_base_url
         

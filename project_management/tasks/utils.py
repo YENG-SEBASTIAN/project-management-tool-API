@@ -20,13 +20,13 @@ def send_task_assignment_email(task):
         fail_silently=False,
     )
 
-def send_organization_member_email(user, organization, request):
+def send_organization_member_email(email, organization, request):
     subject = 'You have been added to a new organization'
     frontend_url = request.frontend_base_url
-    html_message = render_to_string('organization_member_email.html', {'user': user, 'organization': organization, 'frontend_url': frontend_url})
+    html_message = render_to_string('organization_member_email.html', {'email': email, 'organization': organization, 'frontend_url': frontend_url})
     plain_message = strip_tags(html_message)
     from_email = settings.EMAIL_HOST_USER
-    to_email = user.email
+    to_email = email
 
     send_mail(
         subject,
