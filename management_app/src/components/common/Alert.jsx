@@ -9,10 +9,12 @@ const Alert = ({ message, type }) => {
     return () => clearTimeout(timer);
   }, []);
 
+  const alertClassName = type === 'success' ? 'bg-green-500' : 'bg-red-500';
+
   return (
     <div
       id="alert"
-      className={`fixed top-0 right-0 m-4 p-4 bg-${type === 'success' ? 'green' : 'red'}-500 text-white rounded shadow-lg z-50`}
+      className={`fixed top-0 right-0 m-4 p-4 ${alertClassName} text-white rounded shadow-lg z-50`}
     >
       {message}
     </div>
