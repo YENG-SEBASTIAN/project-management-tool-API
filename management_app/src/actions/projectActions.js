@@ -24,7 +24,7 @@ export const getProjects = () => async dispatch => {
 
   try {
     const token = localStorage.getItem('token');
-    const res = await axios.get(`${base_url}project/projects/`, {
+    const res = await axios.get(`${base_url}api/projects/`, {
       headers: {
         Authorization: `Bearer ${token}`
       }
@@ -49,7 +49,7 @@ export const addProject = ({ name, description, owner }) => async dispatch => {
   try {
     const token = localStorage.getItem('token');
     const res = await axios.post(
-      `${base_url}project/projects/`,
+      `${base_url}api/projects/`,
       { name, description, owner },
       {
         headers: {
@@ -80,7 +80,7 @@ export const updateProject = (id, { name, description, owner }) => async dispatc
   try {
     const token = localStorage.getItem('token');
     const res = await axios.put(
-      `${base_url}project/projects/${id}/`,
+      `${base_url}api/projects/${id}/`,
       { name, description, owner },
       {
         headers: {
@@ -110,7 +110,7 @@ export const deleteProject = id => async dispatch => {
 
   try {
     const token = localStorage.getItem('token');
-    await axios.delete(`${base_url}project/projects/${id}/`, {
+    await axios.delete(`${base_url}api/projects/${id}/`, {
       headers: {
         Authorization: `Bearer ${token}`
       }

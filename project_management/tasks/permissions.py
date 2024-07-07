@@ -2,10 +2,15 @@
 
 from rest_framework.permissions import BasePermission
 
-class IsProjectOwner(BasePermission):
+class IsOrganizationOwner(BasePermission):
     def has_object_permission(self, request, view, obj):
         return obj.owner == request.user
 
-class IsAssignee(BasePermission):
+class IsOrganizationMemberOrAssignee(BasePermission):
     def has_object_permission(self, request, view, obj):
-        return obj.assignee == request.user
+        user = request.user
+        return user == obj.owner or user in obj.members.all()
+
+class IsTaskAssignee(BasePermission):
+    def has_object_permission(self, request, view, obj):
+        return obj.owner or obj.assignee == request.user

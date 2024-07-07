@@ -11,6 +11,7 @@ const ProtectedRoute = ({ children }) => {
     // If user is idle for 20 minutes, clear the token and navigate to login page
     if (token) {
       localStorage.removeItem('token');
+      localStorage.removeItem('user');
       navigate('/');
     }
   };

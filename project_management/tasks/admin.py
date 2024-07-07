@@ -1,7 +1,18 @@
 # admin.py
 from django.contrib import admin
-from tasks.models import Project, Milestone, Task, TaskComment, TaskLog
+from tasks.models import Organization, MemberEmail, Project, Milestone, Task, TaskComment, TaskLog
 
+
+@admin.register(MemberEmail)
+class MemberEmailAdmin(admin.ModelAdmin):
+    list_display = ('email',)
+    search_fields = ('email',)
+
+# Register the Organization model in the admin
+@admin.register(Organization)
+class OrganizationAdmin(admin.ModelAdmin):
+    list_display = ('name', 'description', 'owner')
+    filter_horizontal = ('members_emails',) 
 @admin.register(Project)
 class ProjectAdmin(admin.ModelAdmin):
     list_display = ['id', 'name', 'description', 'owner', 'created_at', 'updated_at']

@@ -1,7 +1,9 @@
 # urls.py
 
 from django.urls import path
-from .views import (
+from tasks.views import (
+    OrganizationListCreateView,
+    OrganizationDetailView,
     ProjectListCreateView,
     ProjectDetailView,
     MilestoneListCreateView,
@@ -9,10 +11,12 @@ from .views import (
     TaskListCreateView,
     TaskDetailView,
     TaskCommentListCreateView,
-    TaskCommentDetailView
+    TaskCommentDetailView,
 )
 
 urlpatterns = [
+    path('organizations/', OrganizationListCreateView.as_view(), name='organization-list-create'),
+    path('organizations/<int:pk>/', OrganizationDetailView.as_view(), name='organization-detail'),
     path('projects/', ProjectListCreateView.as_view(), name='project-list-create'),
     path('projects/<int:pk>/', ProjectDetailView.as_view(), name='project-detail'),
     path('milestones/', MilestoneListCreateView.as_view(), name='milestone-list-create'),

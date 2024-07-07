@@ -1,18 +1,32 @@
 from django.db import models
 from accounts.models import User
 
+class Organization(models.Model):
+    name = models.CharField(max_length=100)
+    description = models.TextField(blank=True)
+    owner = models.ForeignKey(User, on_delete=models.CASCADE, related_name='owned_organizations')
+    members_emails = models.ManyToManyField('MemberEmail', related_name='organizations', blank=True)
+
+    def __str__(self):
+        return self.name
+
+class MemberEmail(models.Model):
+    email = models.EmailField(unique=True)
+
+    def __str__(self):
+        return self.email
 
 class Project(models.Model):
     name = models.CharField(max_length=100)
     description = models.TextField(blank=True)
     owner = models.ForeignKey(User, on_delete=models.CASCADE, related_name='owned_projects')
+    organization = models.ForeignKey(Organization, on_delete=models.CASCADE, related_name='owned_projects')
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
 
     def __str__(self):
         return self.name
 
-# Milestone model
 class Milestone(models.Model):
     name = models.CharField(max_length=100)
     due_date = models.DateField()
@@ -23,7 +37,6 @@ class Milestone(models.Model):
     def __str__(self):
         return self.name
 
-# Task model
 class Task(models.Model):
     name = models.CharField(max_length=100)
     description = models.TextField(blank=True)
@@ -36,7 +49,6 @@ class Task(models.Model):
     def __str__(self):
         return self.name
 
-# TaskComment model
 class TaskComment(models.Model):
     task = models.ForeignKey(Task, on_delete=models.CASCADE, related_name='comments')
     user = models.ForeignKey(User, on_delete=models.CASCADE, related_name='task_comments')
@@ -46,7 +58,6 @@ class TaskComment(models.Model):
     def __str__(self):
         return f'Comment by {self.user.username} on {self.task.name}'
 
-# TaskLog model
 class TaskLog(models.Model):
     ACTION_CHOICES = [
         ('created', 'Created'),
@@ -61,4 +72,3 @@ class TaskLog(models.Model):
 
     def __str__(self):
         return f'{self.action} by {self.user.username} on {self.task.name} at {self.timestamp}'
-

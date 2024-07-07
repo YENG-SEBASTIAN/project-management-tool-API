@@ -1,11 +1,9 @@
-<!-- task_assignment_email.html -->
-
 <!DOCTYPE html>
 <html lang="en">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Task Assignment</title>
+    <title>New Organization Member</title>
     <style>
         body {
             font-family: Arial, sans-serif;
@@ -45,17 +43,18 @@
 <body>
     <div class="container">
         <div class="header">
-            <h1>New Task Assignment</h1>
+            <h1>Welcome to the Organization!</h1>
         </div>
         <div class="content">
-            <p>Hello {{ task.assignee.email }},</p>
-            <p>You have been assigned to a new task: <strong>{{ task.name }}</strong>.</p>
-            <p><strong>Description:</strong> {{ task.description }}</p>
+            <p>Hello {{ user.email }},</p>
+            <p>You have been added as a member to the organization: <strong>{{ organization.name }}</strong>.</p>
+            <p>Get ready to collaborate and achieve great things together!</p>
+            <p>You can sign up for an account at <a href="{{ frontend_url }}">Sign Up Here</a>.</p>
             <p>Best regards,</p>
-            <p>Your Project Management Team</p>
+            <p>The Organization Management Team</p>
         </div>
         <div class="footer">
-            <p>&copy; <span id="currentYear"></span> Project Management Tool. All rights reserved.</p>
+            <p>&copy; <span id="currentYear"></span> Organization Management Tool. All rights reserved.</p>
         </div>
     </div>
     <script>
