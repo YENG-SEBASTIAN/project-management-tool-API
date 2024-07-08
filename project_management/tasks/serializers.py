@@ -4,16 +4,19 @@ from tasks.models import Organization, MemberEmail, Project, Milestone, Task, Ta
 from tasks.utils import send_organization_member_email
 
 
-
 class OrganizationSerializer(serializers.ModelSerializer):
     members_emails = serializers.ListField(
         child=serializers.EmailField(), write_only=True
     )
+    members_emails_display = serializers.SerializerMethodField()
 
     class Meta:
         model = Organization
-        fields = ['id', 'name', 'description', 'owner', 'members_emails']
-        read_only_fields = ['owner']
+        fields = ['id', 'name', 'description', 'owner', 'members_emails', 'members_emails_display']
+        read_only_fields = ['owner', 'members_emails_display']
+
+    def get_members_emails_display(self, obj):
+        return [member.email for member in obj.members_emails.all()]
 
     def validate(self, data):
         request = self.context.get('request')
@@ -49,6 +52,10 @@ class OrganizationSerializer(serializers.ModelSerializer):
             send_organization_member_email(email, organization, self.context['request'])
 
         return organization
+
+    
+    
+    
 class ProjectSerializer(serializers.ModelSerializer):
     class Meta:
         model = Project
