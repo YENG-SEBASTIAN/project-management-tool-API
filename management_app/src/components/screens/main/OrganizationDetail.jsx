@@ -27,6 +27,8 @@ const OrganizationDetail = () => {
     }
   }, [organizations]);
 
+  console.log(currentOrganization)
+
   const handleDelete = async () => {
     await dispatch(deleteOrganization(id));
     return navigate('/dashboard/organization');
@@ -66,7 +68,7 @@ const OrganizationDetail = () => {
       <p className="text-lg">Description: {currentOrganization.description}</p>
       <h2 className="mt-4 text-xl font-bold">Members</h2>
       <ul className="mt-2">
-        {currentOrganization.members_emails && currentOrganization.members_emails.map((email, index) => (
+        {currentOrganization.members_emails_display && currentOrganization.members_emails_display.map((email, index) => (
           <li key={index} className="py-1">{email}</li>
         ))}
       </ul>
