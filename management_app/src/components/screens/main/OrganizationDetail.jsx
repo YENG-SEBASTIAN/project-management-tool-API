@@ -61,11 +61,11 @@ const OrganizationDetail = () => {
       </div>
       <p className="text-lg">Description: {currentOrganization.description}</p>
       <h2 className="mt-4 text-xl font-bold">Members</h2>
-      {/* <ul className="mt-2">
+      <ul className="mt-2">
         {currentOrganization.members_emails.map((email, index) => (
           <li key={index} className="py-1">{email}</li>
         ))}
-      </ul> */}
+      </ul>
 
       {showConfirmModal && (
         <ConfirmModal
@@ -76,14 +76,14 @@ const OrganizationDetail = () => {
           submitName="Delete"
         />
       )}
-{/* 
+
       {showUpdateModal && (
         <UpdateModal
           onClose={() => setShowUpdateModal(false)}
           organization={currentOrganization}
           onUpdate={(updatedData) => dispatch(updateOrganization(id, updatedData))}
         />
-      )} */}
+      )}
     </div>
   );
 };
