@@ -1,4 +1,5 @@
 import React, { useState } from 'react';
+import Spinner from './Spinner';
 
 const UpdateModal = ({ onClose, organization, onUpdate }) => {
   const [formData, setFormData] = useState({
@@ -6,6 +7,7 @@ const UpdateModal = ({ onClose, organization, onUpdate }) => {
     description: organization.description,
     members_emails: organization.members_emails_display.join(', '),
   });
+  const [loading, setLoading] = useState(false);
 
   const handleChange = (e) => {
     setFormData({
@@ -14,12 +16,14 @@ const UpdateModal = ({ onClose, organization, onUpdate }) => {
     });
   };
 
-  const handleSubmit = (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
-    onUpdate({
+    setLoading(true);
+    await onUpdate({
       ...formData,
       members_emails: formData.members_emails.split(',').map(email => email.trim()),
     });
+    setLoading(false);
     onClose();
   };
 
@@ -61,11 +65,15 @@ const UpdateModal = ({ onClose, organization, onUpdate }) => {
             />
           </div>
           <div className="mt-6 flex justify-end space-x-2">
-            <button className="px-4 py-2 bg-gray-200 rounded" onClick={onClose}>
+            <button type="button" className="px-4 py-2 bg-gray-200 rounded" onClick={onClose}>
               Cancel
             </button>
-            <button type="submit" className="px-4 py-2 bg-blue-500 text-white rounded">
-              Update
+            <button type="submit" className="px-4 py-2 bg-orange-500 text-white rounded flex items-center justify-center">
+              {loading ? (
+                <Spinner/>
+              ) : (
+                'Update'
+              )}
             </button>
           </div>
         </form>
