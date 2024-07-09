@@ -29,7 +29,13 @@ export const MILESTONE_DETAILS_FAIL = 'MILESTONE_DETAILS_FAIL';
 export const listMilestones = () => async (dispatch) => {
   try {
     dispatch({ type: MILESTONE_LIST_REQUEST });
-    const { data } = await axios.get(`${base_url}api/milestones/`);
+
+    const token = localStorage.getItem('token');
+    const { data } = await axios.get(`${base_url}api/milestones/`,{
+      headers: {
+        Authorization: `Bearer ${token}`
+      }
+    });
     dispatch({ type: MILESTONE_LIST_SUCCESS, payload: data });
   } catch (error) {
     dispatch({ type: MILESTONE_LIST_FAIL, payload: error.response && error.response.data.detail ? error.response.data.detail : error.message });
@@ -39,7 +45,14 @@ export const listMilestones = () => async (dispatch) => {
 export const createMilestone = (milestone) => async (dispatch) => {
   try {
     dispatch({ type: MILESTONE_CREATE_REQUEST });
-    const { data } = await axios.post(`${base_url}api/milestones/`, milestone);
+
+    const token = localStorage.getItem('token');
+    const { data } = await axios.post(`${base_url}api/milestones/`, milestone, {
+      headers: {
+        Authorization: `Bearer ${token}`
+      }
+    }
+    );
     dispatch({ type: MILESTONE_CREATE_SUCCESS, payload: data });
   } catch (error) {
     dispatch({ type: MILESTONE_CREATE_FAIL, payload: error.response && error.response.data.detail ? error.response.data.detail : error.message });
@@ -49,7 +62,13 @@ export const createMilestone = (milestone) => async (dispatch) => {
 export const updateMilestone = (id, milestone) => async (dispatch) => {
   try {
     dispatch({ type: MILESTONE_UPDATE_REQUEST });
-    const { data } = await axios.put(`${base_url}api/milestones/${id}/`, milestone);
+
+    const token = localStorage.getItem('token');
+    const { data } = await axios.put(`${base_url}api/milestones/${id}/`, milestone, {
+      headers: {
+        Authorization: `Bearer ${token}`
+      }
+    });
     dispatch({ type: MILESTONE_UPDATE_SUCCESS, payload: data });
   } catch (error) {
     dispatch({ type: MILESTONE_UPDATE_FAIL, payload: error.response && error.response.data.detail ? error.response.data.detail : error.message });
@@ -59,7 +78,13 @@ export const updateMilestone = (id, milestone) => async (dispatch) => {
 export const patchMilestone = (id, milestone) => async (dispatch) => {
   try {
     dispatch({ type: MILESTONE_PATCH_REQUEST });
-    const { data } = await axios.patch(`${base_url}api/milestones/${id}/`, milestone);
+
+    const token = localStorage.getItem('token');
+    const { data } = await axios.patch(`${base_url}api/milestones/${id}/`, milestone, {
+      headers: {
+        Authorization: `Bearer ${token}`
+      }
+    });
     dispatch({ type: MILESTONE_PATCH_SUCCESS, payload: data });
   } catch (error) {
     dispatch({ type: MILESTONE_PATCH_FAIL, payload: error.response && error.response.data.detail ? error.response.data.detail : error.message });
@@ -69,7 +94,13 @@ export const patchMilestone = (id, milestone) => async (dispatch) => {
 export const deleteMilestone = (id) => async (dispatch) => {
   try {
     dispatch({ type: MILESTONE_DELETE_REQUEST });
-    await axios.delete(`${base_url}api/milestones/${id}/`);
+
+    const token = localStorage.getItem('token');
+    await axios.delete(`${base_url}api/milestones/${id}/`, {
+      headers: {
+        Authorization: `Bearer ${token}`
+      }
+    });
     dispatch({ type: MILESTONE_DELETE_SUCCESS, payload: id });
   } catch (error) {
     dispatch({ type: MILESTONE_DELETE_FAIL, payload: error.response && error.response.data.detail ? error.response.data.detail : error.message });
@@ -79,7 +110,13 @@ export const deleteMilestone = (id) => async (dispatch) => {
 export const getMilestoneDetails = (id) => async (dispatch) => {
   try {
     dispatch({ type: MILESTONE_DETAILS_REQUEST });
-    const { data } = await axios.get(`${base_url}api/milestones/${id}/`);
+
+    const token = localStorage.getItem('token');
+    const { data } = await axios.get(`${base_url}api/milestones/${id}/`, {
+      headers: {
+        Authorization: `Bearer ${token}`
+      }
+    });
     dispatch({ type: MILESTONE_DETAILS_SUCCESS, payload: data });
   } catch (error) {
     dispatch({ type: MILESTONE_DETAILS_FAIL, payload: error.response && error.response.data.detail ? error.response.data.detail : error.message });
