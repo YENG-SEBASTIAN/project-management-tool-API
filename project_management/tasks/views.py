@@ -38,9 +38,7 @@ class ProjectDetailView(generics.RetrieveUpdateDestroyAPIView):
     permission_classes = [IsAuthenticated, IsOrganizationMemberOrAssignee]
 
     def perform_update(self, serializer):
-        task = serializer.save()
-        if task.assignee:
-            send_task_assignment_email(task)
+        serializer.save()
 
 class MilestoneListCreateView(generics.ListCreateAPIView):
     queryset = Milestone.objects.all()

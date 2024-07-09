@@ -2,12 +2,14 @@ import React, { useEffect, useState } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import { FiPlus, FiTrash, FiEdit } from 'react-icons/fi';
 import { addProject, getProjects, deleteProject, updateProject } from '../../../actions/projectActions';
+import { getOrganizations } from '../../../actions/organizationActions';
 import Spinner from '../../common/Spinner';
 import Alert from '../../common/Alert';
 
 const Project = () => {
   const dispatch = useDispatch();
-  const { projects, loading, error } = useSelector(state => state.projects);
+  const { projects, loading: projectsLoading, error: projectsError } = useSelector(state => state.projects);
+  const { organizations, loading: organizationsLoading, error: organizationsError } = useSelector(state => state.organizations);
 
   const [isAddModalOpen, setIsAddModalOpen] = useState(false);
   const [isUpdateModalOpen, setIsUpdateModalOpen] = useState(false);
@@ -18,6 +20,7 @@ const Project = () => {
   const [errorMessage, setErrorMessage] = useState('');
   const [projectName, setProjectName] = useState('');
   const [projectDescription, setProjectDescription] = useState('');
+  const [projectOrganization, setProjectOrganization] = useState('');
   const [user, setUser] = useState(JSON.parse(localStorage.getItem('user')).id);
 
   const colors = [
@@ -26,17 +29,17 @@ const Project = () => {
 
   useEffect(() => {
     dispatch(getProjects());
+    dispatch(getOrganizations());
   }, [dispatch]);
 
   const handleAddNewProject = async (e) => {
     e.preventDefault();
-    const ownerId = JSON.parse(localStorage.getItem('user')).id;
-
     try {
-      await dispatch(addProject({ name: projectName, description: projectDescription, owner: user }));
+      await dispatch(addProject({ name: projectName, description: projectDescription, owner: user, organization: projectOrganization }));
       setSuccessMessage('Project added successfully.');
       setProjectName('');
       setProjectDescription('');
+      setProjectOrganization('');
       setIsAddModalOpen(false);
     } catch (err) {
       setErrorMessage(err.message || 'Failed to add project');
@@ -45,12 +48,12 @@ const Project = () => {
 
   const handleUpdateProject = async (e) => {
     e.preventDefault();
-
     try {
-      await dispatch(updateProject(selectedProject.id, { name: projectName, description: projectDescription, owner: selectedProject.owner }));
+      await dispatch(updateProject(selectedProject.id, { name: projectName, description: projectDescription, owner: selectedProject.owner, organization: projectOrganization }));
       setSuccessMessage('Project updated successfully.');
       setProjectName('');
       setProjectDescription('');
+      setProjectOrganization('');
       setIsUpdateModalOpen(false);
     } catch (err) {
       setErrorMessage(err.response?.data?.detail || 'Failed to update project');
@@ -76,14 +79,18 @@ const Project = () => {
     setSelectedProject(project);
     setProjectName(project.name);
     setProjectDescription(project.description);
+    setProjectOrganization(project.organization);
     setIsUpdateModalOpen(true);
   };
 
+  console.log(projectOrganization.name)
+
   return (
     <div className="p-4">
-      {error && <Alert message={error} type="error" />}
+      {projectsError && <Alert message={projectsError} type="error" />}
+      {organizationsError && <Alert message={organizationsError} type="error" />}
       {successMessage && <Alert message={successMessage} type="success" />}
-      {/* {errorMessage && <Alert message={errorMessage} type="error" />} */}
+      {errorMessage && <Alert message={errorMessage} type="error" />}
 
       <div className="flex justify-between items-center mb-4">
         <h1 className="text-2xl font-bold">Projects</h1>
@@ -95,7 +102,7 @@ const Project = () => {
         </button>
       </div>
 
-      {loading ? (
+      {projectsLoading || organizationsLoading ? (
         <Spinner />
       ) : (
         <div className="grid gap-4 grid-cols-1 sm:grid-cols-2 lg:grid-cols-3">
@@ -106,29 +113,29 @@ const Project = () => {
               onClick={() => handleCardClick(project)}
             >
               <h2 className="text-xl font-bold">{project.name}</h2>
-              {project.owner === user ? (
-              <div className="flex justify-between mt-2">
-                <button
-                  className="py-1 px-3 bg-blue-600 text-white rounded flex items-center"
-                  onClick={(e) => {
-                    e.stopPropagation();
-                    openUpdateModal(project);
-                  }}
-                >
-                  <FiEdit className="mr-1" /> Update
-                </button>
-                <button
-                  className="py-1 px-3 bg-red-600 text-white rounded flex items-center"
-                  onClick={(e) => {
-                    e.stopPropagation();
-                    setSelectedProject(project);
-                    setIsDeleteModalOpen(true);
-                  }}
-                >
-                  <FiTrash />
-                </button>
-              </div>
-              ): ''}
+              {project.owner === user && (
+                <div className="flex justify-between mt-2">
+                  <button
+                    className="py-1 px-3 bg-blue-600 text-white rounded flex items-center"
+                    onClick={(e) => {
+                      e.stopPropagation();
+                      openUpdateModal(project);
+                    }}
+                  >
+                    <FiEdit className="mr-1" /> Update
+                  </button>
+                  <button
+                    className="py-1 px-3 bg-red-600 text-white rounded flex items-center"
+                    onClick={(e) => {
+                      e.stopPropagation();
+                      setSelectedProject(project);
+                      setIsDeleteModalOpen(true);
+                    }}
+                  >
+                    <FiTrash />
+                  </button>
+                </div>
+              )}
             </div>
           ))}
         </div>
@@ -160,6 +167,21 @@ const Project = () => {
                   onChange={(e) => setProjectDescription(e.target.value)}
                   required
                 />
+              </div>
+              <div className="mb-4">
+                <label className="block text-gray-700 mb-2">Organization</label>
+                <select
+                  name="projectOrganization"
+                  className="w-full px-3 py-2 border rounded"
+                  value={projectOrganization}
+                  onChange={(e) => setProjectOrganization(e.target.value)}
+                  required
+                >
+                  <option value="">Select an Organization</option>
+                  {organizations.map(org => (
+                    <option key={org.id} value={org.id}>{org.name}</option>
+                  ))}
+                </select>
               </div>
               <div className="flex justify-end">
                 <button
@@ -205,6 +227,21 @@ const Project = () => {
                   required
                 />
               </div>
+              <div className="mb-4">
+                <label className="block text-gray-700 mb-2">Organization</label>
+                <select
+                  name="projectOrganization"
+                  className="w-full px-3 py-2 border rounded"
+                  value={projectOrganization}
+                  onChange={(e) => setProjectOrganization(e.target.value)}
+                  required
+                >
+                  <option value="">Select an Organization</option>
+                  {organizations.map(org => (
+                    <option key={org.id} value={org.id}>{org.name}</option>
+                  ))}
+                </select>
+              </div>
               <div className="flex justify-end">
                 <button
                   type="button"
@@ -222,31 +259,12 @@ const Project = () => {
         </div>
       )}
 
-      {/* Project Details Modal */}
-      {isDetailModalOpen && (
-        <div className="fixed inset-0 bg-black bg-opacity-50 flex justify-center items-center z-50">
-          <div className="bg-white p-6 rounded shadow-lg w-full max-w-md">
-            <h2 className="text-xl font-bold mb-4">{selectedProject.name}</h2>
-            <p className="mb-4">{selectedProject.description}</p>
-            <div className="flex justify-end">
-              <button
-                type="button"
-                className="py-2 px-4 bg-orange-600 text-white rounded"
-                onClick={() => setIsDetailModalOpen(false)}
-              >
-                Close
-              </button>
-            </div>
-          </div>
-        </div>
-      )}
-
-      {/* Delete Confirmation Modal */}
+      {/* Delete Project Modal */}
       {isDeleteModalOpen && (
         <div className="fixed inset-0 bg-black bg-opacity-50 flex justify-center items-center z-50">
           <div className="bg-white p-6 rounded shadow-lg w-full max-w-md">
-            <h2 className="text-xl font-bold mb-4">Confirm Deletion</h2>
-            <p>Are you sure you want to delete the project "{selectedProject?.name}"?</p>
+            <h2 className="text-xl font-bold mb-4">Delete Project</h2>
+            <p>Are you sure you want to delete the project "{selectedProject.name}"?</p>
             <div className="flex justify-end mt-4">
               <button
                 type="button"
@@ -256,11 +274,31 @@ const Project = () => {
                 Cancel
               </button>
               <button
-                type="button"
                 className="py-2 px-4 bg-red-600 text-white rounded"
                 onClick={handleDeleteProject}
               >
                 Delete
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* Project Details Modal */}
+      {isDetailModalOpen && (
+        <div className="fixed inset-0 bg-black bg-opacity-50 flex justify-center items-center z-50">
+          <div className="bg-white p-6 rounded shadow-lg w-full max-w-md">
+            <h2 className="text-xl font-bold mb-4">Project Details</h2>
+            <p><strong>Name:</strong> {selectedProject.name}</p>
+            <p><strong>Description:</strong> {selectedProject.description}</p>
+            <p><strong>Organization:</strong> {selectedProject.organization.name}</p>
+            <div className="flex justify-end mt-4">
+              <button
+                type="button"
+                className="py-2 px-4 bg-gray-300 rounded"
+                onClick={() => setIsDetailModalOpen(false)}
+              >
+                Close
               </button>
             </div>
           </div>

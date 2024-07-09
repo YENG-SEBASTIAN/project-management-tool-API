@@ -43,14 +43,14 @@ export const getProjects = () => async dispatch => {
 };
 
 // Add Project
-export const addProject = ({ name, description, owner }) => async dispatch => {
+export const addProject = ({ name, description, owner, organization }) => async dispatch => {
   dispatch({ type: ADD_PROJECT_REQUEST });
 
   try {
     const token = localStorage.getItem('token');
     const res = await axios.post(
       `${base_url}api/projects/`,
-      { name, description, owner },
+      { name, description, owner, organization },
       {
         headers: {
           Authorization: `Bearer ${token}`
@@ -74,14 +74,14 @@ export const addProject = ({ name, description, owner }) => async dispatch => {
 };
 
 // Update Project
-export const updateProject = (id, { name, description, owner }) => async dispatch => {
+export const updateProject = (id, { name, description, owner, organization }) => async dispatch => {
   dispatch({ type: UPDATE_PROJECT_REQUEST });
 
   try {
     const token = localStorage.getItem('token');
     const res = await axios.put(
       `${base_url}api/projects/${id}/`,
-      { name, description, owner },
+      { name, description, owner, organization },
       {
         headers: {
           Authorization: `Bearer ${token}`
