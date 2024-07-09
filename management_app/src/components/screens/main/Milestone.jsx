@@ -2,20 +2,22 @@ import React, { useEffect, useState } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import { listMilestones, createMilestone } from '../../../actions/milestoneActions';
 import { getProjects } from '../../../actions/projectActions';
-import { FiPlus, FiTrash, FiEdit } from 'react-icons/fi';
-import { AiOutlineFileSearch } from 'react-icons/ai';
+import { FiPlus } from 'react-icons/fi';
+import { AiOutlineSearch } from 'react-icons/ai';
 import Modal from '../../common/Modal';
 import Spinner from '../../common/Spinner';
 import Alert from '../../common/Alert';
+import { useNavigate } from 'react-router-dom';
 
-const MilestoneList = ({ navigate }) => {
+const MilestoneList = () => {
   const dispatch = useDispatch();
+  const navigate = useNavigate(); // Using useNavigate hook for navigation
 
-  const milestoneList = useSelector((state) => state.milestones);
-  const { loading: milestoneLoading, error: milestoneError, milestones = [] } = milestoneList || {};
+  const milestoneList = useSelector((state) => state.milestones.milestoneList);
+  const { loading: milestoneLoading, error: milestoneError, milestones } = milestoneList;
 
-  const projectList = useSelector((state) => state.projectList);
-  const { loading: projectLoading, error: projectError, projects = [] } = projectList || {};
+  const projectList = useSelector((state) => state.projects);
+  const { loading: projectLoading, error: projectError, projects } = projectList;
 
   const [name, setName] = useState('');
   const [dueDate, setDueDate] = useState('');
@@ -28,7 +30,7 @@ const MilestoneList = ({ navigate }) => {
     dispatch(listMilestones());
     dispatch(getProjects());
   }, [dispatch]);
-console.log("projects", projects)
+
   const submitHandler = async (e) => {
     e.preventDefault();
     try {
@@ -47,7 +49,7 @@ console.log("projects", projects)
     <div className="p-4">
       {milestoneLoading || projectLoading ? (
         <Spinner />
-      ) : (milestoneError || projectError) ? (
+      ) : milestoneError || projectError ? (
         <Alert message={milestoneError || projectError} type="error" />
       ) : (
         <>
@@ -64,7 +66,7 @@ console.log("projects", projects)
           </div>
           {milestones.length === 0 ? (
             <div className="flex flex-col items-center justify-center h-64">
-              <AiOutlineFileSearch size={48} className="mb-4" />
+              <AiOutlineSearch size={48} className="mb-4" />
               <p className="text-gray-500">No milestones available.</p>
             </div>
           ) : (
@@ -73,7 +75,7 @@ console.log("projects", projects)
                 <div
                   key={milestone.id}
                   className="cursor-pointer p-4 bg-white rounded shadow-md"
-                  onClick={() => navigate(`/dashboard/milestones/${milestone.id}`)}
+                  onClick={() => navigate(`/dashboard/milestone/${milestone.id}`)} // Navigate using useNavigate hook
                 >
                   <h2 className="text-xl font-bold">{milestone.name}</h2>
                   <p className="text-gray-500">Due Date: {milestone.due_date}</p>
