@@ -1,69 +1,114 @@
-import axios from 'axios';
-import { base_url } from '../constants/constant';
+import { combineReducers } from 'redux';
+
 import {
-  MILESTONE_LIST_REQUEST,
-  MILESTONE_LIST_SUCCESS,
-  MILESTONE_LIST_FAIL,
-  MILESTONE_CREATE_REQUEST,
-  MILESTONE_CREATE_SUCCESS,
-  MILESTONE_CREATE_FAIL,
-  MILESTONE_UPDATE_REQUEST,
-  MILESTONE_UPDATE_SUCCESS,
-  MILESTONE_UPDATE_FAIL,
-  MILESTONE_DELETE_REQUEST,
-  MILESTONE_DELETE_SUCCESS,
-  MILESTONE_DELETE_FAIL,
-  MILESTONE_PATCH_REQUEST,
-  MILESTONE_PATCH_SUCCESS,
-  MILESTONE_PATCH_FAIL,
-} from '../actions/milestoneReducers';
+    MILESTONE_LIST_REQUEST,
+    MILESTONE_LIST_SUCCESS,
+    MILESTONE_LIST_FAIL,
+    MILESTONE_CREATE_REQUEST,
+    MILESTONE_CREATE_SUCCESS,
+    MILESTONE_CREATE_FAIL,
+    MILESTONE_UPDATE_REQUEST,
+    MILESTONE_UPDATE_SUCCESS,
+    MILESTONE_UPDATE_FAIL,
+    MILESTONE_DELETE_REQUEST,
+    MILESTONE_DELETE_SUCCESS,
+    MILESTONE_DELETE_FAIL,
+    MILESTONE_PATCH_REQUEST,
+    MILESTONE_PATCH_SUCCESS,
+    MILESTONE_PATCH_FAIL,
+    MILESTONE_DETAILS_REQUEST,
+    MILESTONE_DETAILS_SUCCESS,
+    MILESTONE_DETAILS_FAIL,
+  } from '../actions/milestoneActions';
+  
+  export const milestoneListReducer = (state = { milestones: [] }, action) => {
+    switch (action.type) {
+      case MILESTONE_LIST_REQUEST:
+        return { loading: true, milestones: [] };
+      case MILESTONE_LIST_SUCCESS:
+        return { loading: false, milestones: action.payload };
+      case MILESTONE_LIST_FAIL:
+        return { loading: false, error: action.payload };
+      default:
+        return state;
+    }
+  };
+  
+  export const milestoneCreateReducer = (state = {}, action) => {
+    switch (action.type) {
+      case MILESTONE_CREATE_REQUEST:
+        return { loading: true };
+      case MILESTONE_CREATE_SUCCESS:
+        return { loading: false, success: true, milestone: action.payload };
+      case MILESTONE_CREATE_FAIL:
+        return { loading: false, error: action.payload };
+      default:
+        return state;
+    }
+  };
+  
+  export const milestoneUpdateReducer = (state = { milestone: {} }, action) => {
+    switch (action.type) {
+      case MILESTONE_UPDATE_REQUEST:
+        return { loading: true };
+      case MILESTONE_UPDATE_SUCCESS:
+        return { loading: false, success: true, milestone: action.payload };
+      case MILESTONE_UPDATE_FAIL:
+        return { loading: false, error: action.payload };
+      default:
+        return state;
+    }
+  };
+  
+  export const milestoneDeleteReducer = (state = {}, action) => {
+    switch (action.type) {
+      case MILESTONE_DELETE_REQUEST:
+        return { loading: true };
+      case MILESTONE_DELETE_SUCCESS:
+        return { loading: false, success: true };
+      case MILESTONE_DELETE_FAIL:
+        return { loading: false, error: action.payload };
+      default:
+        return state;
+    }
+  };
+  
+  export const milestonePatchReducer = (state = { milestone: {} }, action) => {
+    switch (action.type) {
+      case MILESTONE_PATCH_REQUEST:
+        return { loading: true };
+      case MILESTONE_PATCH_SUCCESS:
+        return { loading: false, success: true, milestone: action.payload };
+      case MILESTONE_PATCH_FAIL:
+        return { loading: false, error: action.payload };
+      default:
+        return state;
+    }
+  };
+  
+  export const milestoneDetailsReducer = (state = { milestone: {} }, action) => {
+    switch (action.type) {
+      case MILESTONE_DETAILS_REQUEST:
+        return { loading: true };
+      case MILESTONE_DETAILS_SUCCESS:
+        return { loading: false, milestone: action.payload };
+      case MILESTONE_DETAILS_FAIL:
+        return { loading: false, error: action.payload };
+      default:
+        return state;
+    }
+  };
+  
 
-export const listMilestones = () => async (dispatch) => {
-  try {
-    dispatch({ type: MILESTONE_LIST_REQUEST });
-    const { data } = await axios.get(`${base_url}/milestones/`);
-    dispatch({ type: MILESTONE_LIST_SUCCESS, payload: data });
-  } catch (error) {
-    dispatch({ type: MILESTONE_LIST_FAIL, payload: error.response && error.response.data.detail ? error.response.data.detail : error.message });
-  }
-};
 
-export const createMilestone = (milestone) => async (dispatch) => {
-  try {
-    dispatch({ type: MILESTONE_CREATE_REQUEST });
-    const { data } = await axios.post(`${base_url}/milestones/`, milestone);
-    dispatch({ type: MILESTONE_CREATE_SUCCESS, payload: data });
-  } catch (error) {
-    dispatch({ type: MILESTONE_CREATE_FAIL, payload: error.response && error.response.data.detail ? error.response.data.detail : error.message });
-  }
-};
 
-export const updateMilestone = (id, milestone) => async (dispatch) => {
-  try {
-    dispatch({ type: MILESTONE_UPDATE_REQUEST });
-    const { data } = await axios.put(`${base_url}/milestones/${id}/`, milestone);
-    dispatch({ type: MILESTONE_UPDATE_SUCCESS, payload: data });
-  } catch (error) {
-    dispatch({ type: MILESTONE_UPDATE_FAIL, payload: error.response && error.response.data.detail ? error.response.data.detail : error.message });
-  }
-};
+const milestonesReducer = combineReducers({
+    milestoneList: milestoneListReducer,
+    milestoneCreate: milestoneCreateReducer,
+    milestoneUpdate: milestoneUpdateReducer,
+    milestoneDelete: milestoneDeleteReducer,
+    milestonePatch: milestonePatchReducer,
+    milestoneDetail: milestoneDetailsReducer,
+});
 
-export const deleteMilestone = (id) => async (dispatch) => {
-  try {
-    dispatch({ type: MILESTONE_DELETE_REQUEST });
-    await axios.delete(`${base_url}/milestones/${id}/`);
-    dispatch({ type: MILESTONE_DELETE_SUCCESS, payload: id });
-  } catch (error) {
-    dispatch({ type: MILESTONE_DELETE_FAIL, payload: error.response && error.response.data.detail ? error.response.data.detail : error.message });
-  }
-};
-
-export const patchMilestone = (id, milestone) => async (dispatch) => {
-  try {
-    dispatch({ type: MILESTONE_PATCH_REQUEST });
-    const { data } = await axios.patch(`${base_url}/milestones/${id}/`, milestone);
-    dispatch({ type: MILESTONE_PATCH_SUCCESS, payload: data });
-  } catch (error) {
-    dispatch({ type: MILESTONE_PATCH_FAIL, payload: error.response && error.response.data.detail ? error.response.data.detail : error.message });
-  }
-};
+export default milestonesReducer;

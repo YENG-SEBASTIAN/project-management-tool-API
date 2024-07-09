@@ -1,55 +1,61 @@
 import React, { useEffect, useState } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
-import { listMilestones, createMilestone } from '../../../actions/milestoneActions';
+import { getMilestoneDetails, updateMilestone, patchMilestone, deleteMilestone } from '../../../actions/milestoneActions';
 import { getProjects } from '../../../actions/projectActions';
 
-const MilestoneList = ({ history }) => {
+const MilestoneDetail = ({ match, history }) => {
+  const milestoneId = match.params.id;
   const dispatch = useDispatch();
 
-  const milestoneList = useSelector((state) => state.milestoneList);
-  const { loading: milestoneLoading, error: milestoneError, milestones = [] } = milestoneList || {};
+  const milestoneDetails = useSelector((state) => state.milestoneDetails);
+  const { loading, error, milestone } = milestoneDetails;
 
   const projectList = useSelector((state) => state.projectList);
-  const { loading: projectLoading, error: projectError, projects = [] } = projectList || {};
+  const { projects } = projectList;
 
   const [name, setName] = useState('');
   const [dueDate, setDueDate] = useState('');
   const [project, setProject] = useState('');
 
   useEffect(() => {
-    dispatch(listMilestones());
+    dispatch(getMilestoneDetails(milestoneId));
     dispatch(getProjects());
-  }, [dispatch]);
+  }, [dispatch, milestoneId]);
+
+  useEffect(() => {
+    if (milestone) {
+      setName(milestone.name);
+      setDueDate(milestone.due_date);
+      setProject(milestone.project);
+    }
+  }, [milestone]);
 
   const submitHandler = (e) => {
     e.preventDefault();
-    dispatch(createMilestone({ name, due_date: dueDate, project }));
-    setName('');
-    setDueDate('');
-    setProject('');
+    dispatch(updateMilestone(milestoneId, { name, due_date: dueDate, project }));
+    history.push('/dashboard/milestones');
+  };
+
+  const patchHandler = (e) => {
+    e.preventDefault();
+    dispatch(patchMilestone(milestoneId, { name, due_date: dueDate, project }));
+    history.push('/dashboard/milestones');
+  };
+
+  const deleteHandler = () => {
+    dispatch(deleteMilestone(milestoneId));
+    history.push('/dashboard/milestones');
   };
 
   return (
     <div className="p-4">
-      <h1 className="text-2xl font-bold mb-4">Milestones</h1>
-      {milestoneLoading || projectLoading ? (
+      <h1 className="text-2xl font-bold mb-4">Milestone Detail</h1>
+      {loading ? (
         <p>Loading...</p>
-      ) : (milestoneError || projectError) ? (
-        <p>Error: {milestoneError || projectError}</p>
+      ) : error ? (
+        <p>Error: {error}</p>
       ) : (
-        <>
-          <ul className="mb-4">
-            {milestones.map((milestone) => (
-              <li
-                key={milestone.id}
-                className="cursor-pointer p-2 bg-gray-100 rounded mb-2"
-                onClick={() => history.push(`/dashboard/milestones/${milestone.id}`)}
-              >
-                {milestone.name}
-              </li>
-            ))}
-          </ul>
-          <h2 className="text-xl font-bold mb-2">Create Milestone</h2>
+        <div>
           <form onSubmit={submitHandler}>
             <div className="mb-2">
               <label className="block text-gray-700">Name</label>
@@ -85,13 +91,27 @@ const MilestoneList = ({ history }) => {
               </select>
             </div>
             <button type="submit" className="p-2 bg-blue-500 text-white rounded">
-              Create
+              Update
+            </button>
+            <button
+              type="button"
+              className="p-2 bg-yellow-500 text-white rounded ml-2"
+              onClick={patchHandler}
+            >
+              Patch
+            </button>
+            <button
+              type="button"
+              className="p-2 bg-red-500 text-white rounded ml-2"
+              onClick={deleteHandler}
+            >
+              Delete
             </button>
           </form>
-        </>
+        </div>
       )}
     </div>
   );
 };
 
-export default MilestoneList;
+export default MilestoneDetail;
