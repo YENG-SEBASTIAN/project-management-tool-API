@@ -22,22 +22,26 @@ const OrganizationDetail = () => {
   }, [dispatch, id]);
 
   useEffect(() => {
-    if (organizations.length > 0) {
+    if (organizations && organizations.length > 0) {
       setCurrentOrganization(organizations[0]);
     }
   }, [organizations]);
 
-  const handleDelete = async () =>{
+  const handleDelete = async () => {
     await dispatch(deleteOrganization(id));
-    return navigate('dashboard/organization')
+    return navigate('/dashboard/organization');
   }
 
   if (loading) {
     return <Spinner />;
   }
 
-  if (error || !currentOrganization) {
-    return <Alert message={error || "Organization not found"} type="error" />;
+  if (error) {
+    return <Alert message={error} type="error" />;
+  }
+
+  if (!currentOrganization) {
+    return <Alert message="Organization not found" type="error" />;
   }
 
   return (
@@ -62,7 +66,7 @@ const OrganizationDetail = () => {
       <p className="text-lg">Description: {currentOrganization.description}</p>
       <h2 className="mt-4 text-xl font-bold">Members</h2>
       <ul className="mt-2">
-        {currentOrganization.members_emails.map((email, index) => (
+        {currentOrganization.members_emails && currentOrganization.members_emails.map((email, index) => (
           <li key={index} className="py-1">{email}</li>
         ))}
       </ul>
