@@ -4,7 +4,7 @@ const UpdateModal = ({ onClose, organization, onUpdate }) => {
   const [formData, setFormData] = useState({
     name: organization.name,
     description: organization.description,
-    members_emails: organization.members_emails.join(', '),
+    members_emails: organization.members_emails_display.join(', '),
   });
 
   const handleChange = (e) => {
