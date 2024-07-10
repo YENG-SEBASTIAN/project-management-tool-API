@@ -27,7 +27,6 @@ const OrganizationDetail = () => {
     }
   }, [organizations]);
 
-  console.log(currentOrganization)
 
   const handleDelete = async () => {
     await dispatch(deleteOrganization(id));

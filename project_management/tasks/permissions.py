@@ -1,16 +1,23 @@
-# permissions.py
+from rest_framework import permissions
 
-from rest_framework.permissions import BasePermission
+class IsOrganizationMemberOrAssignee(permissions.BasePermission):
+    """
+    Permission check for members of the organization or assignees of tasks.
+    """
 
-class IsOrganizationOwner(BasePermission):
     def has_object_permission(self, request, view, obj):
-        return obj.owner == request.user
+        # Check if the user is the owner of the organization
+        if obj.owner == request.user:
+            return True
 
-class IsOrganizationMemberOrAssignee(BasePermission):
-    def has_object_permission(self, request, view, obj):
-        user = request.user
-        return user == obj.owner or user in obj.members.all()
+        # Check if the user is a member of the organization
+        return obj.members_emails.filter(email=request.user.email).exists()
 
-class IsTaskAssignee(BasePermission):
+class IsTaskAssignee(permissions.BasePermission):
+    """
+    Permission check for task assignees.
+    """
+
     def has_object_permission(self, request, view, obj):
-        return obj.owner or obj.assignee == request.user
+        # Check if the user is the assignee of the task
+        return obj.assignee == request.user

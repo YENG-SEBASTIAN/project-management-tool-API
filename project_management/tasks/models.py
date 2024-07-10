@@ -20,7 +20,7 @@ class Project(models.Model):
     name = models.CharField(max_length=100)
     description = models.TextField(blank=True)
     owner = models.ForeignKey(User, on_delete=models.CASCADE, related_name='owned_projects')
-    organization = models.ForeignKey(Organization, on_delete=models.CASCADE, related_name='owned_projects')
+    organization = models.ForeignKey(Organization, on_delete=models.CASCADE, related_name='projects')
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
 
@@ -29,8 +29,10 @@ class Project(models.Model):
 
 class Milestone(models.Model):
     name = models.CharField(max_length=100)
+    start_date = models.DateField()
     due_date = models.DateField()
     project = models.ForeignKey(Project, on_delete=models.CASCADE, related_name='milestones')
+    owner = models.ForeignKey(User, on_delete=models.CASCADE, related_name='owned_milestones')
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
 

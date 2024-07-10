@@ -53,28 +53,30 @@ class OrganizationSerializer(serializers.ModelSerializer):
 
         return organization
 
-    
-    
-    
+
 class ProjectSerializer(serializers.ModelSerializer):
     class Meta:
         model = Project
         fields = ['id', 'name', 'description', 'owner', 'organization', 'created_at', 'updated_at']
 
+
 class MilestoneSerializer(serializers.ModelSerializer):
     class Meta:
         model = Milestone
-        fields = ['id', 'name', 'due_date', 'project', 'created_at', 'updated_at']
+        fields = ['id', 'name', 'start_date', 'due_date', 'project', 'created_at', 'updated_at']
+
 
 class TaskSerializer(serializers.ModelSerializer):
     class Meta:
         model = Task
         fields = ['id', 'name', 'description', 'milestone', 'assignee', 'completed', 'created_at', 'updated_at']
 
+
 class TaskCommentSerializer(serializers.ModelSerializer):
     class Meta:
         model = TaskComment
         fields = ['id', 'task', 'user', 'comment', 'created_at']
+
 
 class TaskLogSerializer(serializers.ModelSerializer):
     class Meta:
