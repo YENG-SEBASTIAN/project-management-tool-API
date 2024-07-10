@@ -11,7 +11,7 @@ import { useNavigate } from 'react-router-dom';
 
 const MilestoneList = () => {
   const dispatch = useDispatch();
-  const navigate = useNavigate(); // Using useNavigate hook for navigation
+  const navigate = useNavigate();
 
   const milestoneList = useSelector((state) => state.milestones.milestoneList);
   const { loading: milestoneLoading, error: milestoneError, milestones } = milestoneList;
@@ -20,11 +20,14 @@ const MilestoneList = () => {
   const { loading: projectLoading, error: projectError, projects } = projectList;
 
   const [name, setName] = useState('');
+  const [startDate, setStartDate] = useState('');
   const [dueDate, setDueDate] = useState('');
   const [project, setProject] = useState('');
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [successMessage, setSuccessMessage] = useState('');
   const [errorMessage, setErrorMessage] = useState('');
+  const [user, setUser] = useState(JSON.parse(localStorage.getItem('user')).id);
+
 
   useEffect(() => {
     dispatch(listMilestones());
@@ -34,9 +37,10 @@ const MilestoneList = () => {
   const submitHandler = async (e) => {
     e.preventDefault();
     try {
-      await dispatch(createMilestone({ name, due_date: dueDate, project }));
+      await dispatch(createMilestone({ name, start_date: startDate, due_date: dueDate, project, owner: user }));
       setSuccessMessage('Milestone created successfully.');
       setName('');
+      setStartDate('');
       setDueDate('');
       setProject('');
       setIsModalOpen(false);
@@ -75,9 +79,10 @@ const MilestoneList = () => {
                 <div
                   key={milestone.id}
                   className="cursor-pointer p-4 bg-white rounded shadow-md"
-                  onClick={() => navigate(`/dashboard/milestone/${milestone.id}`)} // Navigate using useNavigate hook
+                  onClick={() => navigate(`/dashboard/milestone/${milestone.id}`)}
                 >
                   <h2 className="text-xl font-bold">{milestone.name}</h2>
+                  <p className="text-gray-500">Start Date: {milestone.start_date}</p>
                   <p className="text-gray-500">Due Date: {milestone.due_date}</p>
                 </div>
               ))}
@@ -94,6 +99,16 @@ const MilestoneList = () => {
                       type="text"
                       value={name}
                       onChange={(e) => setName(e.target.value)}
+                      className="p-2 border border-gray-300 rounded w-full"
+                      required
+                    />
+                  </div>
+                  <div className="mb-2">
+                    <label className="block text-gray-700">Start Date</label>
+                    <input
+                      type="date"
+                      value={startDate}
+                      onChange={(e) => setStartDate(e.target.value)}
                       className="p-2 border border-gray-300 rounded w-full"
                       required
                     />

@@ -1,6 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import { FiPlus, FiTrash, FiEdit } from 'react-icons/fi';
+import { AiOutlineSearch } from 'react-icons/ai';
 import { addProject, getProjects, deleteProject, updateProject } from '../../../actions/projectActions';
 import { getOrganizations } from '../../../actions/organizationActions';
 import Spinner from '../../common/Spinner';
@@ -102,6 +103,11 @@ const Project = () => {
 
       {projectsLoading || organizationsLoading ? (
         <Spinner />
+      ) : projects.length === 0 ? (
+        <div className="flex flex-col items-center justify-center h-64">
+          <AiOutlineSearch size={48} className="mb-4" />
+          <p className="text-gray-500">No Projects available.</p>
+        </div>
       ) : (
         <div className="grid gap-4 grid-cols-1 sm:grid-cols-2 lg:grid-cols-3">
           {projects.map((project, index) => (
@@ -257,12 +263,32 @@ const Project = () => {
         </div>
       )}
 
-      {/* Delete Project Modal */}
+      {/* Project Details Modal */}
+      {isDetailModalOpen && (
+        <div className="fixed inset-0 bg-black bg-opacity-50 flex justify-center items-center z-50">
+          <div className="bg-white p-6 rounded shadow-lg w-full max-w-md">
+            <h2 className="text-xl font-bold mb-4">{selectedProject.name}</h2>
+            <p><strong>Description:</strong> {selectedProject.description}</p>
+            <p><strong>Organization:</strong> {selectedProject.organization.name}</p>
+            <div className="flex justify-end mt-4">
+              <button
+                type="button"
+                className="py-2 px-4 bg-gray-300 rounded"
+                onClick={() => setIsDetailModalOpen(false)}
+              >
+                Close
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* Delete Project Confirmation Modal */}
       {isDeleteModalOpen && (
         <div className="fixed inset-0 bg-black bg-opacity-50 flex justify-center items-center z-50">
           <div className="bg-white p-6 rounded shadow-lg w-full max-w-md">
             <h2 className="text-xl font-bold mb-4">Delete Project</h2>
-            <p>Are you sure you want to delete the project "{selectedProject.name}"?</p>
+            <p>Are you sure you want to delete this project?</p>
             <div className="flex justify-end mt-4">
               <button
                 type="button"
@@ -272,31 +298,11 @@ const Project = () => {
                 Cancel
               </button>
               <button
+                type="button"
                 className="py-2 px-4 bg-red-600 text-white rounded"
                 onClick={handleDeleteProject}
               >
                 Delete
-              </button>
-            </div>
-          </div>
-        </div>
-      )}
-
-      {/* Project Details Modal */}
-      {isDetailModalOpen && (
-        <div className="fixed inset-0 bg-black bg-opacity-50 flex justify-center items-center z-50">
-          <div className="bg-white p-6 rounded shadow-lg w-full max-w-md">
-            <h2 className="text-xl font-bold mb-4">Project Details</h2>
-            <p><strong>Name:</strong> {selectedProject.name}</p>
-            <p><strong>Description:</strong> {selectedProject.description}</p>
-            <p><strong>Organization:</strong> {selectedProject.organization}</p> {/* Display organization name */}
-            <div className="flex justify-end mt-4">
-              <button
-                type="button"
-                className="py-2 px-4 bg-gray-300 rounded"
-                onClick={() => setIsDetailModalOpen(false)}
-              >
-                Close
               </button>
             </div>
           </div>

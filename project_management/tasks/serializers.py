@@ -63,7 +63,7 @@ class ProjectSerializer(serializers.ModelSerializer):
 class MilestoneSerializer(serializers.ModelSerializer):
     class Meta:
         model = Milestone
-        fields = ['id', 'name', 'start_date', 'due_date', 'project', 'created_at', 'updated_at']
+        fields = ['id', 'name', 'start_date', 'due_date', 'owner', 'project', 'created_at', 'updated_at']
 
 
 class TaskSerializer(serializers.ModelSerializer):

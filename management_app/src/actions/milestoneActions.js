@@ -31,14 +31,17 @@ export const listMilestones = () => async (dispatch) => {
     dispatch({ type: MILESTONE_LIST_REQUEST });
 
     const token = localStorage.getItem('token');
-    const { data } = await axios.get(`${base_url}api/milestones/`,{
+    const { data } = await axios.get(`${base_url}api/milestones/`, {
       headers: {
         Authorization: `Bearer ${token}`
       }
     });
     dispatch({ type: MILESTONE_LIST_SUCCESS, payload: data });
   } catch (error) {
-    dispatch({ type: MILESTONE_LIST_FAIL, payload: error.response && error.response.data.detail ? error.response.data.detail : error.message });
+    dispatch({
+      type: MILESTONE_LIST_FAIL,
+      payload: error.response && error.response.data.detail ? error.response.data.detail : error.message
+    });
   }
 };
 
@@ -51,11 +54,13 @@ export const createMilestone = (milestone) => async (dispatch) => {
       headers: {
         Authorization: `Bearer ${token}`
       }
-    }
-    );
+    });
     dispatch({ type: MILESTONE_CREATE_SUCCESS, payload: data });
   } catch (error) {
-    dispatch({ type: MILESTONE_CREATE_FAIL, payload: error.response && error.response.data.detail ? error.response.data.detail : error.message });
+    dispatch({
+      type: MILESTONE_CREATE_FAIL,
+      payload: error.response && error.response.data.detail ? error.response.data.detail : error.message
+    });
   }
 };
 
@@ -71,7 +76,10 @@ export const updateMilestone = (id, milestone) => async (dispatch) => {
     });
     dispatch({ type: MILESTONE_UPDATE_SUCCESS, payload: data });
   } catch (error) {
-    dispatch({ type: MILESTONE_UPDATE_FAIL, payload: error.response && error.response.data.detail ? error.response.data.detail : error.message });
+    dispatch({
+      type: MILESTONE_UPDATE_FAIL,
+      payload: error.response && error.response.data.detail ? error.response.data.detail : error.message
+    });
   }
 };
 
@@ -87,7 +95,10 @@ export const patchMilestone = (id, milestone) => async (dispatch) => {
     });
     dispatch({ type: MILESTONE_PATCH_SUCCESS, payload: data });
   } catch (error) {
-    dispatch({ type: MILESTONE_PATCH_FAIL, payload: error.response && error.response.data.detail ? error.response.data.detail : error.message });
+    dispatch({
+      type: MILESTONE_PATCH_FAIL,
+      payload: error.response && error.response.data.detail ? error.response.data.detail : error.message
+    });
   }
 };
 
@@ -103,7 +114,10 @@ export const deleteMilestone = (id) => async (dispatch) => {
     });
     dispatch({ type: MILESTONE_DELETE_SUCCESS, payload: id });
   } catch (error) {
-    dispatch({ type: MILESTONE_DELETE_FAIL, payload: error.response && error.response.data.detail ? error.response.data.detail : error.message });
+    dispatch({
+      type: MILESTONE_DELETE_FAIL,
+      payload: error.response && error.response.data.detail ? error.response.data.detail : error.message
+    });
   }
 };
 
@@ -119,6 +133,9 @@ export const getMilestoneDetails = (id) => async (dispatch) => {
     });
     dispatch({ type: MILESTONE_DETAILS_SUCCESS, payload: data });
   } catch (error) {
-    dispatch({ type: MILESTONE_DETAILS_FAIL, payload: error.response && error.response.data.detail ? error.response.data.detail : error.message });
+    dispatch({
+      type: MILESTONE_DETAILS_FAIL,
+      payload: error.response && error.response.data.detail ? error.response.data.detail : error.message
+    });
   }
 };
