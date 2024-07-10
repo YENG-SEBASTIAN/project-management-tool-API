@@ -19,9 +19,10 @@ const MilestoneDetail = () => {
   const [currentMilestone, setCurrentMilestone] = useState(null);
   const [name, setName] = useState('');
   const [dueDate, setDueDate] = useState('');
+  const [startDate, setStartDate] = useState('');
   const [project, setProject] = useState('');
 
-  const milestoneDetails = useSelector((state) => state.milestoneDetails);
+  const milestoneDetails = useSelector((state) => state.milestones.milestoneDetail);
   const { loading, error, milestone } = milestoneDetails || {};
 
   const projectList = useSelector((state) => state.projects);
@@ -37,6 +38,7 @@ const MilestoneDetail = () => {
       setCurrentMilestone(milestone);
       setName(milestone.name);
       setDueDate(milestone.due_date);
+      setStartDate(milestone.start_date);
       setProject(milestone.project);
     }
   }, [milestone]);
@@ -48,7 +50,7 @@ const MilestoneDetail = () => {
 
   const handleUpdate = (e) => {
     e.preventDefault();
-    dispatch(updateMilestone(milestoneId, { name, due_date: dueDate, project }));
+    dispatch(updateMilestone(milestoneId, { name, due_date: dueDate, start_date: startDate, project }));
     setShowUpdateModal(false);
   };
 
@@ -84,7 +86,8 @@ const MilestoneDetail = () => {
         </div>
       </div>
       <p className="text-lg">Due Date: {currentMilestone.due_date}</p>
-      <p className="text-lg">Project: {currentMilestone.project_name}</p>
+      <p className="text-lg">Start Date: {currentMilestone.start_date}</p>
+      <p className="text-lg">Project: {currentMilestone.project}</p>
 
       {showConfirmModal && (
         <ConfirmModal
@@ -106,6 +109,15 @@ const MilestoneDetail = () => {
                 type="text"
                 value={name}
                 onChange={(e) => setName(e.target.value)}
+                className="p-2 border border-gray-300 rounded w-full"
+              />
+            </div>
+            <div className="mb-2">
+              <label className="block text-gray-700">Start Date</label>
+              <input
+                type="date"
+                value={startDate}
+                onChange={(e) => setStartDate(e.target.value)}
                 className="p-2 border border-gray-300 rounded w-full"
               />
             </div>
@@ -133,9 +145,18 @@ const MilestoneDetail = () => {
                 ))}
               </select>
             </div>
-            <button type="submit" className="p-2 bg-blue-500 text-white rounded">
-              Update
-            </button>
+            <div className="flex justify-end">
+              <button
+                type="button"
+                className="mr-4 py-2 px-4 bg-gray-300 rounded"
+                onClick={() => setShowUpdateModal(false)}
+              >
+                Cancel
+              </button>
+              <button type="submit" className="py-2 px-4 bg-orange-600 text-white rounded">
+                Update
+              </button>
+            </div>
           </form>
         </Modal>
       )}
