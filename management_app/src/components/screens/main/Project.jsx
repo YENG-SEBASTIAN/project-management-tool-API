@@ -79,11 +79,9 @@ const Project = () => {
     setSelectedProject(project);
     setProjectName(project.name);
     setProjectDescription(project.description);
-    setProjectOrganization(project.organization);
+    setProjectOrganization(project.organization); // Assuming `project.organization` is the organization object
     setIsUpdateModalOpen(true);
   };
-
-  console.log(projectOrganization.name)
 
   return (
     <div className="p-4">
@@ -291,7 +289,7 @@ const Project = () => {
             <h2 className="text-xl font-bold mb-4">Project Details</h2>
             <p><strong>Name:</strong> {selectedProject.name}</p>
             <p><strong>Description:</strong> {selectedProject.description}</p>
-            <p><strong>Organization:</strong> {selectedProject.organization.name}</p>
+            <p><strong>Organization:</strong> {selectedProject.organization}</p> {/* Display organization name */}
             <div className="flex justify-end mt-4">
               <button
                 type="button"
