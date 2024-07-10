@@ -15,10 +15,10 @@ const MilestoneDetail = () => {
 
   // Redux state selectors
   const milestoneDetails = useSelector((state) => state.milestoneDetails);
-  const { loading, error, milestone } = milestoneDetails;
+  const { loading, error, milestone } = milestoneDetails || {};
 
-  const projectList = useSelector((state) => state.projectList);
-  const { projects } = projectList;
+  const projectList = useSelector((state) => state.projects);
+  const { projects } = projectList || {};
 
   // Fetch milestone details and projects on component mount
   useEffect(() => {
@@ -90,7 +90,7 @@ const MilestoneDetail = () => {
               className="p-2 border border-gray-300 rounded w-full"
             >
               <option value="">Select Project</option>
-              {projects.map((proj) => (
+              {projects && projects.map((proj) => (
                 <option key={proj.id} value={proj.id}>
                   {proj.name}
                 </option>

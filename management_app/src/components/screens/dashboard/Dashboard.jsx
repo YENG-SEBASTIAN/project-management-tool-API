@@ -25,7 +25,7 @@ const Dashboard = () => {
           <Routes>
             <Route path="/projects" element={<Project />} />
             <Route path="/milestones" element={<Milestone />} />
-            <Route path="/milestone/:id" component={<MilestoneDetail />} />
+            <Route path="/milestone/:id" element={<MilestoneDetail />} />
             <Route path="/tasks" element={<Tasks />} />
             <Route path="/organizations" element={<Organization />} />
             <Route path="/organization/:id" element={<OrganizationDetail />} />
