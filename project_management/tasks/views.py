@@ -2,8 +2,8 @@ from rest_framework import generics, permissions
 from django.db import models
 from tasks.models import Project, Milestone, Task, TaskComment, Organization
 from tasks.serializers import ProjectSerializer, MilestoneSerializer, TaskSerializer, TaskCommentSerializer, OrganizationSerializer
-from tasks.permissions import IsOrganizationMemberOrAssignee, IsTaskAssignee
-from tasks.utils import send_task_assignment_email, send_organization_member_email
+from tasks.permissions import IsOrganizationMemberOrOwner, IsTaskAssigneeOrMember
+from tasks.utils import send_task_assignment_email
 
 class OrganizationListCreateView(generics.ListCreateAPIView):
     queryset = Organization.objects.all()
@@ -22,11 +22,10 @@ class OrganizationListCreateView(generics.ListCreateAPIView):
             models.Q(members_emails__email=self.request.user.email)
         ).distinct()
 
-
 class OrganizationDetailView(generics.RetrieveUpdateDestroyAPIView):
     queryset = Organization.objects.all()
     serializer_class = OrganizationSerializer
-    permission_classes = [permissions.IsAuthenticated, IsOrganizationMemberOrAssignee]
+    permission_classes = [permissions.IsAuthenticated, IsOrganizationMemberOrOwner]
 
     def perform_update(self, serializer):
         serializer.save()
@@ -39,7 +38,6 @@ class OrganizationDetailView(generics.RetrieveUpdateDestroyAPIView):
             models.Q(owner=self.request.user) |
             models.Q(members_emails__email=self.request.user.email)
         ).distinct()
-
 
 class ProjectListCreateView(generics.ListCreateAPIView):
     queryset = Project.objects.all()
@@ -58,11 +56,10 @@ class ProjectListCreateView(generics.ListCreateAPIView):
             models.Q(organization__members_emails__email=self.request.user.email)
         ).distinct()
 
-
 class ProjectDetailView(generics.RetrieveUpdateDestroyAPIView):
     queryset = Project.objects.all()
     serializer_class = ProjectSerializer
-    permission_classes = [permissions.IsAuthenticated, IsOrganizationMemberOrAssignee]
+    permission_classes = [permissions.IsAuthenticated, IsOrganizationMemberOrOwner]
 
     def perform_update(self, serializer):
         serializer.save()
@@ -76,18 +73,15 @@ class ProjectDetailView(generics.RetrieveUpdateDestroyAPIView):
             models.Q(organization__members_emails__email=self.request.user.email)
         ).distinct()
 
-
 class MilestoneListCreateView(generics.ListCreateAPIView):
     queryset = Milestone.objects.all()
     serializer_class = MilestoneSerializer
     permission_classes = [permissions.IsAuthenticated]
 
-
 class MilestoneDetailView(generics.RetrieveUpdateDestroyAPIView):
     queryset = Milestone.objects.all()
     serializer_class = MilestoneSerializer
-    permission_classes = [permissions.IsAuthenticated, IsOrganizationMemberOrAssignee | IsTaskAssignee]
-
+    permission_classes = [permissions.IsAuthenticated, IsOrganizationMemberOrOwner]
 
 class TaskListCreateView(generics.ListCreateAPIView):
     queryset = Task.objects.all()
@@ -108,20 +102,17 @@ class TaskListCreateView(generics.ListCreateAPIView):
             models.Q(milestone__project__organization__members_emails__email=self.request.user.email)
         ).distinct()
 
-
-class TaskDetailView(generics.RetrieveUpdateDestroyAPIView):
+class TaskDetailView(generics.RetrieveUpdateAPIView):  # Allow only read and update, not delete
     queryset = Task.objects.all()
     serializer_class = TaskSerializer
-    permission_classes = [permissions.IsAuthenticated, IsOrganizationMemberOrAssignee | IsTaskAssignee]
-
+    permission_classes = [permissions.IsAuthenticated, IsTaskAssigneeOrMember]
 
 class TaskCommentListCreateView(generics.ListCreateAPIView):
     queryset = TaskComment.objects.all()
     serializer_class = TaskCommentSerializer
     permission_classes = [permissions.IsAuthenticated]
 
-
 class TaskCommentDetailView(generics.RetrieveUpdateDestroyAPIView):
     queryset = TaskComment.objects.all()
     serializer_class = TaskCommentSerializer
-    permission_classes = [permissions.IsAuthenticated, IsOrganizationMemberOrAssignee | IsTaskAssignee]
+    permission_classes = [permissions.IsAuthenticated, IsTaskAssigneeOrMember]

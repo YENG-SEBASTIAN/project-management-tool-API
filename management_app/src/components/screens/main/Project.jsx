@@ -1,11 +1,12 @@
 import React, { useEffect, useState } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
-import { FiPlus, FiTrash, FiEdit } from 'react-icons/fi';
+import { FiPlus } from 'react-icons/fi';
 import { AiOutlineSearch } from 'react-icons/ai';
 import { addProject, getProjects, deleteProject, updateProject } from '../../../actions/projectActions';
 import { getOrganizations } from '../../../actions/organizationActions';
 import Spinner from '../../common/Spinner';
 import Alert from '../../common/Alert';
+import ItemList from '../../common/ItemList';
 
 const Project = () => {
   const dispatch = useDispatch();
@@ -23,10 +24,6 @@ const Project = () => {
   const [projectDescription, setProjectDescription] = useState('');
   const [projectOrganization, setProjectOrganization] = useState('');
   const [user, setUser] = useState(JSON.parse(localStorage.getItem('user')).id);
-
-  const colors = [
-    'bg-red-100', 'bg-green-100', 'bg-blue-100', 'bg-yellow-100', 'bg-purple-100', 'bg-pink-100', 'bg-indigo-100'
-  ];
 
   useEffect(() => {
     dispatch(getProjects());
@@ -109,40 +106,14 @@ const Project = () => {
           <p className="text-gray-500">No Projects available.</p>
         </div>
       ) : (
-        <div className="grid gap-4 grid-cols-1 sm:grid-cols-2 lg:grid-cols-3">
-          {projects.map((project, index) => (
-            <div
-              key={project.id}
-              className={`p-4 rounded shadow cursor-pointer ${colors[index % colors.length]}`}
-              onClick={() => handleCardClick(project)}
-            >
-              <h2 className="text-xl font-bold">{project.name}</h2>
-              {project.owner === user && (
-                <div className="flex justify-between mt-2">
-                  <button
-                    className="py-1 px-3 bg-blue-600 text-white rounded flex items-center"
-                    onClick={(e) => {
-                      e.stopPropagation();
-                      openUpdateModal(project);
-                    }}
-                  >
-                    <FiEdit className="mr-1" /> Update
-                  </button>
-                  <button
-                    className="py-1 px-3 bg-red-600 text-white rounded flex items-center"
-                    onClick={(e) => {
-                      e.stopPropagation();
-                      setSelectedProject(project);
-                      setIsDeleteModalOpen(true);
-                    }}
-                  >
-                    <FiTrash />
-                  </button>
-                </div>
-              )}
-            </div>
-          ))}
-        </div>
+        <ItemList
+          items={projects}
+          onItemClick={handleCardClick}
+          emptyMessage="No Projects available."
+          itemKey="id"
+          itemTitle="name"
+          itemDescription="description"
+        />
       )}
 
       {/* Add New Project Modal */}
@@ -263,33 +234,60 @@ const Project = () => {
         </div>
       )}
 
-      {/* Project Details Modal */}
+      {/* Detail Project Modal */}
       {isDetailModalOpen && (
         <div className="fixed inset-0 bg-black bg-opacity-50 flex justify-center items-center z-50">
           <div className="bg-white p-6 rounded shadow-lg w-full max-w-md">
-            <h2 className="text-xl font-bold mb-4">{selectedProject.name}</h2>
-            <p><strong>Description:</strong> {selectedProject.description}</p>
-            <p><strong>Organization:</strong> {selectedProject.organization.name}</p>
-            <div className="flex justify-end mt-4">
+            <h2 className="text-xl font-bold mb-4">Project Details</h2>
+            <div className="mb-4">
+              <label className="block text-gray-700 mb-2">Project Name</label>
+              <p className="w-full px-3 py-2 border rounded">{selectedProject.name}</p>
+            </div>
+            <div className="mb-4">
+              <label className="block text-gray-700 mb-2">Description</label>
+              <p className="w-full px-3 py-2 border rounded">{selectedProject.description}</p>
+            </div>
+            <div className="mb-4">
+              <label className="block text-gray-700 mb-2">Organization</label>
+              <p className="w-full px-3 py-2 border rounded">{selectedProject.organization}</p>
+            </div>
+            <div className="flex justify-end">
               <button
                 type="button"
-                className="py-2 px-4 bg-gray-300 rounded"
+                className="mr-4 py-2 px-4 bg-gray-300 rounded"
                 onClick={() => setIsDetailModalOpen(false)}
               >
                 Close
+              </button>
+              <button
+                type="button"
+                className="mr-4 py-2 px-4 bg-yellow-500 text-white rounded"
+                onClick={() => openUpdateModal(selectedProject)}
+              >
+                Update
+              </button>
+              <button
+                type="button"
+                className="py-2 px-4 bg-red-600 text-white rounded"
+                onClick={() => {
+                  setIsDetailModalOpen(false);
+                  setIsDeleteModalOpen(true);
+                }}
+              >
+                Delete
               </button>
             </div>
           </div>
         </div>
       )}
 
-      {/* Delete Project Confirmation Modal */}
+      {/* Delete Project Modal */}
       {isDeleteModalOpen && (
         <div className="fixed inset-0 bg-black bg-opacity-50 flex justify-center items-center z-50">
           <div className="bg-white p-6 rounded shadow-lg w-full max-w-md">
-            <h2 className="text-xl font-bold mb-4">Delete Project</h2>
-            <p>Are you sure you want to delete this project?</p>
-            <div className="flex justify-end mt-4">
+            <h2 className="text-xl font-bold mb-4">Confirm Delete</h2>
+            <p className="mb-4">Are you sure you want to delete this project?</p>
+            <div className="flex justify-end">
               <button
                 type="button"
                 className="mr-4 py-2 px-4 bg-gray-300 rounded"

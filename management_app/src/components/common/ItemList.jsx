@@ -3,9 +3,15 @@ import PropTypes from 'prop-types';
 import { MdOutlineAddBusiness } from 'react-icons/md';
 
 const ItemList = ({ items, onItemClick, emptyMessage, itemKey, itemTitle, itemDescription }) => {
-  const colors = [
-    'bg-red-200', 'bg-green-100', 'bg-blue-100', 'bg-yellow-100', 'bg-purple-100', 'bg-pink-100', 'bg-indigo-100'
-  ];
+
+  const generateRandomColor = () => {
+    const letters = '0123456789ABCDEF';
+    let color = '#';
+    for (let i = 0; i < 6; i++) {
+      color += letters[Math.floor(Math.random() * 16)];
+    }
+    return color;
+  };
 
   return (
     <div>
@@ -16,10 +22,11 @@ const ItemList = ({ items, onItemClick, emptyMessage, itemKey, itemTitle, itemDe
         </div>
       ) : (
         <div className="grid gap-4 grid-cols-1 sm:grid-cols-2 lg:grid-cols-3">
-          {items.map((item, index) => (
+          {items.map((item) => (
             <div
               key={item[itemKey]}
-              className={`p-4 rounded shadow cursor-pointer ${colors[index % colors.length]}`}
+              className="p-4 rounded shadow cursor-pointer"
+              style={{ backgroundColor: generateRandomColor() }}
               onClick={() => onItemClick(item[itemKey])}
             >
               <h2 className="text-xl font-bold">{item[itemTitle]}</h2>
