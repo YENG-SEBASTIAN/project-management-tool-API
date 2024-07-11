@@ -1,5 +1,7 @@
-from rest_framework import generics, permissions
+from rest_framework import generics, permissions, status
+from rest_framework.response import Response
 from django.db import models
+from django.contrib.auth.models import User
 from tasks.models import Project, Milestone, Task, TaskComment, Organization
 from tasks.serializers import ProjectSerializer, MilestoneSerializer, TaskSerializer, TaskCommentSerializer, OrganizationSerializer
 from tasks.permissions import IsOrganizationMemberOrOwner, IsTaskAssigneeOrMember
@@ -89,6 +91,9 @@ class TaskListCreateView(generics.ListCreateAPIView):
     permission_classes = [permissions.IsAuthenticated]
 
     def perform_create(self, serializer):
+        assignee = serializer.validated_data.get('assignee')
+        if assignee and not User.objects.filter(email=assignee.email).exists():
+            return Response({'error': 'Assignee email does not exist'}, status=status.HTTP_400_BAD_REQUEST)
         task = serializer.save()
         if task.assignee:
             send_task_assignment_email(task)
@@ -106,6 +111,12 @@ class TaskDetailView(generics.RetrieveUpdateAPIView):  # Allow only read and upd
     queryset = Task.objects.all()
     serializer_class = TaskSerializer
     permission_classes = [permissions.IsAuthenticated, IsTaskAssigneeOrMember]
+
+    def perform_update(self, serializer):
+        assignee = serializer.validated_data.get('assignee')
+        if assignee and not User.objects.filter(email=assignee.email).exists():
+            return Response({'error': 'Assignee email does not exist'}, status=status.HTTP_400_BAD_REQUEST)
+        serializer.save()
 
 class TaskCommentListCreateView(generics.ListCreateAPIView):
     queryset = TaskComment.objects.all()

@@ -1,10 +1,148 @@
-import React from 'react';
+import React, { useEffect, useState } from 'react';
+import { useDispatch, useSelector } from 'react-redux';
+import { FiPlus } from 'react-icons/fi';
+import { AiOutlineSearch } from 'react-icons/ai';
+import { listTasks, createTask } from '../../../actions/taskActions';
+import Spinner from '../../common/Spinner';
+import Alert from '../../common/Alert';
+import ItemList from '../../common/ItemList';
 
 const Tasks = () => {
+  const dispatch = useDispatch();
+  const { tasks, loading: tasksLoading, error: tasksError } = useSelector(state => state.tasks.taskList);
+  const { milestones } = useSelector(state => state.milestones.milestoneList);
+
+  const [isAddModalOpen, setIsAddModalOpen] = useState(false);
+  const [successMessage, setSuccessMessage] = useState('');
+  const [errorMessage, setErrorMessage] = useState('');
+  const [taskName, setTaskName] = useState('');
+  const [taskDescription, setTaskDescription] = useState('');
+  const [taskMilestone, setTaskMilestone] = useState('');
+  const [taskAssignee, setTaskAssignee] = useState('');
+  const [user, setUser] = useState(JSON.parse(localStorage.getItem('user')).id);
+
+  useEffect(() => {
+    dispatch(listTasks());
+  }, [dispatch]);
+
+  const handleAddNewTask = async (e) => {
+    e.preventDefault();
+    try {
+      await dispatch(createTask({ name: taskName, description: taskDescription, milestone: taskMilestone, assignee: taskAssignee }));
+      setSuccessMessage('Task created successfully.');
+      setTaskName('');
+      setTaskDescription('');
+      setTaskMilestone('');
+      setTaskAssignee('');
+      setIsAddModalOpen(false);
+    } catch (err) {
+      setErrorMessage(err.message || 'Failed to create task.');
+    }
+  };
+
   return (
     <div className="p-4">
-      <h1 className="text-2xl font-bold mb-4">Tasks</h1>
-      <p>This is the Tasks page where you can manage all your tasks.</p>
+      {tasksError && <Alert message={tasksError} type="error" />}
+      {successMessage && <Alert message={successMessage} type="success" />}
+      {errorMessage && <Alert message={errorMessage} type="error" />}
+
+      <div className="flex justify-between items-center mb-4">
+        <h1 className="text-2xl font-bold">Tasks</h1>
+        <button
+          className="bg-orange-600 text-white py-2 px-4 rounded flex items-center"
+          onClick={() => setIsAddModalOpen(true)}
+        >
+          <FiPlus className="mr-2" /> Add New Task
+        </button>
+      </div>
+
+      {tasksLoading ? (
+        <Spinner />
+      ) : tasks.length === 0 ? (
+        <div className="flex flex-col items-center justify-center h-64">
+          <AiOutlineSearch size={48} className="mb-4" />
+          <p className="text-gray-500">No Tasks available.</p>
+        </div>
+      ) : (
+        <ItemList
+          items={tasks}
+          onItemClick={() => {}}
+          emptyMessage="No Tasks available."
+          itemKey="id"
+          itemTitle="name"
+          itemDescription="description"
+        />
+      )}
+
+      {/* Add New Task Modal */}
+      {isAddModalOpen && (
+        <div className="fixed inset-0 bg-black bg-opacity-50 flex justify-center items-center z-50">
+          <div className="bg-white p-6 rounded shadow-lg w-full max-w-md">
+            <h2 className="text-xl font-bold mb-4">Add New Task</h2>
+            <form onSubmit={handleAddNewTask}>
+              <div className="mb-4">
+                <label className="block text-gray-700 mb-2">Task Name</label>
+                <input
+                  type="text"
+                  name="taskName"
+                  className="w-full px-3 py-2 border rounded"
+                  value={taskName}
+                  onChange={(e) => setTaskName(e.target.value)}
+                  required
+                />
+              </div>
+              <div className="mb-4">
+                <label className="block text-gray-700 mb-2">Description</label>
+                <textarea
+                  name="taskDescription"
+                  className="w-full px-3 py-2 border rounded"
+                  value={taskDescription}
+                  onChange={(e) => setTaskDescription(e.target.value)}
+                  required
+                />
+              </div>
+              <div className="mb-4">
+                <label className="block text-gray-700 mb-2">Milestone</label>
+                <select
+                  name="taskMilestone"
+                  className="w-full px-3 py-2 border rounded"
+                  value={taskMilestone}
+                  onChange={(e) => setTaskMilestone(e.target.value)}
+                  required
+                >
+                  <option value="">Select Milestone</option>
+                  {milestones.map(m => (
+                    <option key={m.id} value={m.id}>{m.name}</option>
+                  ))}
+                </select>
+              </div>
+              <div className="mb-4">
+                <label className="block text-gray-700 mb-2">Assignee</label>
+                <input
+                  type="email" // Assuming assignee is an email
+                  name="taskAssignee"
+                  className="w-full px-3 py-2 border rounded"
+                  value={taskAssignee}
+                  onChange={(e) => setTaskAssignee(e.target.value)}
+                  required
+                />
+              </div>
+              <div className="flex justify-end">
+                <button
+                  type="button"
+                  className="mr-4 py-2 px-4 bg-gray-300 rounded"
+                  onClick={() => setIsAddModalOpen(false)}
+                >
+                  Cancel
+                </button>
+                <button type="submit" className="py-2 px-4 bg-orange-600 text-white rounded">
+                  Add Task
+                </button>
+              </div>
+            </form>
+          </div>
+        </div>
+      )}
     </div>
   );
 };
