@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>New Organization Member</title>
+    <title>Welcome to the Organization!</title>
     <style>
         body {
             font-family: Arial, sans-serif;
@@ -28,8 +28,6 @@
         }
         .content {
             padding: 20px;
-        }
-        .content p {
             line-height: 1.6;
         }
         .footer {
@@ -49,9 +47,8 @@
             <p>Hello {{ email }},</p>
             <p>You have been added as a member to the organization: <strong>{{ organization.name }}</strong>.</p>
             <p>Get ready to collaborate and achieve great things together!</p>
-            <p>You can sign up for an account at <a href="{{ frontend_url }}register">Sign Up Here</a> In case you don't have an account.</p>
-            <p>Best regards,</p>
-            <p>The Project Management Tool Team</p>
+            <p>Sign in to continue <a href="{{ frontend_url }}register">here</a>.</p>
+            <p>Best regards,<br>The Project Management Tool Team</p>
         </div>
         <div class="footer">
             <p>&copy; <span id="currentYear"></span> Project Management Tool. All rights reserved.</p>

@@ -1,26 +1,26 @@
+import string
 from django.db import models
 from accounts.models import User
+from django.utils.crypto import get_random_string
+
+def generate_unique_id():
+    return get_random_string(length=6, allowed_chars=string.ascii_uppercase + string.digits)
 
 class Organization(models.Model):
+    id = models.CharField(max_length=6, primary_key=True, default=generate_unique_id, editable=False, unique=True)
     name = models.CharField(max_length=100)
-    description = models.TextField(blank=True)
-    owner = models.ForeignKey(User, on_delete=models.CASCADE, related_name='owned_organizations')
-    members_emails = models.ManyToManyField('MemberEmail', related_name='organizations', blank=True)
+    owner = models.ForeignKey(User, related_name='owned_organizations', on_delete=models.CASCADE)
+    members = models.ManyToManyField(User, related_name='organizations')
 
     def __str__(self):
         return self.name
 
-class MemberEmail(models.Model):
-    email = models.EmailField(unique=True)
-
-    def __str__(self):
-        return self.email
-
 class Project(models.Model):
+    id = models.CharField(max_length=6, primary_key=True, default=generate_unique_id, editable=False, unique=True)
     name = models.CharField(max_length=100)
-    description = models.TextField(blank=True)
-    owner = models.ForeignKey(User, on_delete=models.CASCADE, related_name='owned_projects')
-    organization = models.ForeignKey(Organization, on_delete=models.CASCADE, related_name='projects')
+    description = models.TextField(blank=True, null=True)
+    organization = models.ForeignKey(Organization, related_name='projects', on_delete=models.CASCADE)
+    owner = models.ForeignKey(User, related_name='owned_projects', on_delete=models.CASCADE)
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
 
@@ -28,11 +28,11 @@ class Project(models.Model):
         return self.name
 
 class Milestone(models.Model):
+    id = models.CharField(max_length=6, primary_key=True, default=generate_unique_id, editable=False, unique=True)
     name = models.CharField(max_length=100)
-    start_date = models.DateField()
+    description = models.TextField(blank=True, null=True)
     due_date = models.DateField()
-    project = models.ForeignKey(Project, on_delete=models.CASCADE, related_name='milestones')
-    owner = models.ForeignKey(User, on_delete=models.CASCADE, related_name='owned_milestones')
+    project = models.ForeignKey(Project, related_name='milestones', on_delete=models.CASCADE)
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
 
@@ -40,10 +40,13 @@ class Milestone(models.Model):
         return self.name
 
 class Task(models.Model):
+    id = models.CharField(max_length=6, primary_key=True, default=generate_unique_id, editable=False, unique=True)
     name = models.CharField(max_length=100)
-    description = models.TextField(blank=True)
-    milestone = models.ForeignKey(Milestone, on_delete=models.CASCADE, related_name='tasks')
-    assignee = models.ForeignKey(User, on_delete=models.SET_NULL, null=True, related_name='assigned_tasks')
+    description = models.TextField(blank=True, null=True)
+    file = models.FileField(upload_to='tasks/files/')
+    due_date = models.DateField()
+    milestone = models.ForeignKey(Milestone, related_name='tasks', on_delete=models.CASCADE)
+    assignee = models.ForeignKey(User, related_name='assigned_tasks', on_delete=models.SET_NULL, null=True, blank=True)
     completed = models.BooleanField(default=False)
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
@@ -52,25 +55,21 @@ class Task(models.Model):
         return self.name
 
 class TaskComment(models.Model):
-    task = models.ForeignKey(Task, on_delete=models.CASCADE, related_name='comments')
-    user = models.ForeignKey(User, on_delete=models.CASCADE, related_name='task_comments')
+    id = models.CharField(max_length=6, primary_key=True, default=generate_unique_id, editable=False, unique=True)
     comment = models.TextField()
     created_at = models.DateTimeField(auto_now_add=True)
+    updated_at = models.DateTimeField(auto_now=True)
+    task = models.ForeignKey(Task, related_name='comments', on_delete=models.CASCADE)
+    author = models.ForeignKey(User, related_name='comments', on_delete=models.CASCADE)
 
     def __str__(self):
-        return f'Comment by {self.user.username} on {self.task.name}'
+        return f"Comment by {self.author} on {self.task}"
 
-class TaskLog(models.Model):
-    ACTION_CHOICES = [
-        ('created', 'Created'),
-        ('updated', 'Updated'),
-        ('completed', 'Completed'),
-    ]
-
-    task = models.ForeignKey(Task, on_delete=models.CASCADE, related_name='logs')
-    user = models.ForeignKey(User, on_delete=models.CASCADE, related_name='task_logs')
-    action = models.CharField(max_length=10, choices=ACTION_CHOICES)
-    timestamp = models.DateTimeField(auto_now_add=True)
+class File(models.Model):
+    id = models.CharField(max_length=6, primary_key=True, default=generate_unique_id, editable=False, unique=True)
+    task = models.ForeignKey(Task, related_name='files', on_delete=models.CASCADE)
+    file = models.FileField(upload_to='uploads/files/')
+    uploaded_at = models.DateTimeField(auto_now_add=True)
 
     def __str__(self):
-        return f'{self.action} by {self.user.username} on {self.task.name} at {self.timestamp}'
+        return f"File {self.file.name} for Task {self.task.name}"

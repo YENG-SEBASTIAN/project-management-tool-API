@@ -1,7 +1,7 @@
 from rest_framework import generics, permissions, status
 from rest_framework.response import Response
 from django.db import models
-from django.contrib.auth.models import User
+from accounts.models import User
 from tasks.models import Project, Milestone, Task, TaskComment, Organization
 from tasks.serializers import ProjectSerializer, MilestoneSerializer, TaskSerializer, TaskCommentSerializer, OrganizationSerializer
 from tasks.permissions import IsOrganizationMemberOrOwner, IsTaskAssigneeOrMember
@@ -21,7 +21,7 @@ class OrganizationListCreateView(generics.ListCreateAPIView):
         """
         return Organization.objects.filter(
             models.Q(owner=self.request.user) |
-            models.Q(members_emails__email=self.request.user.email)
+            models.Q(members__id=self.request.user.id)
         ).distinct()
 
 class OrganizationDetailView(generics.RetrieveUpdateDestroyAPIView):
@@ -36,9 +36,9 @@ class OrganizationDetailView(generics.RetrieveUpdateDestroyAPIView):
         """
         Get organizations where the user is the owner or a member.
         """
-        return Organization.objects.filter(
+        return self.queryset.filter(
             models.Q(owner=self.request.user) |
-            models.Q(members_emails__email=self.request.user.email)
+            models.Q(members__id=self.request.user.id)
         ).distinct()
 
 class ProjectListCreateView(generics.ListCreateAPIView):
@@ -55,7 +55,7 @@ class ProjectListCreateView(generics.ListCreateAPIView):
         """
         return Project.objects.filter(
             models.Q(owner=self.request.user) |
-            models.Q(organization__members_emails__email=self.request.user.email)
+            models.Q(organization__members__id=self.request.user.id)
         ).distinct()
 
 class ProjectDetailView(generics.RetrieveUpdateDestroyAPIView):
@@ -70,9 +70,9 @@ class ProjectDetailView(generics.RetrieveUpdateDestroyAPIView):
         """
         Get projects where the user is the owner or a member of the organization.
         """
-        return Project.objects.filter(
+        return self.queryset.filter(
             models.Q(owner=self.request.user) |
-            models.Q(organization__members_emails__email=self.request.user.email)
+            models.Q(organization__members__id=self.request.user.id)
         ).distinct()
 
 class MilestoneListCreateView(generics.ListCreateAPIView):
@@ -104,7 +104,7 @@ class TaskListCreateView(generics.ListCreateAPIView):
         """
         return Task.objects.filter(
             models.Q(assignee=self.request.user) |
-            models.Q(milestone__project__organization__members_emails__email=self.request.user.email)
+            models.Q(milestone__project__organization__members__id=self.request.user.id)
         ).distinct()
 
 class TaskDetailView(generics.RetrieveUpdateAPIView):  # Allow only read and update, not delete
