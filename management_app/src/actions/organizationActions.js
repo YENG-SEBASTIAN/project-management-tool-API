@@ -47,70 +47,45 @@ export const getOrganizations = () => async dispatch => {
 };
 
 // Add Organization
-export const addOrganization = ({ name, description, owner, members_emails }) => async dispatch => {
-    dispatch({ type: ADD_ORGANIZATION_REQUEST });
-  
-    try {
-      const token = localStorage.getItem('token');
-      const res = await axios.post(
-        `${base_url}api/organizations/`,
-        { name, description, owner, members_emails },
-        {
-          headers: {
-            Authorization: `Bearer ${token}`
-          }
-        }
-      );
-  
-      dispatch({
-        type: ADD_ORGANIZATION_SUCCESS,
-        payload: res.data
-      });
-  
-      return res.data; // Return the new organization data if needed
-    } catch (err) {
-      dispatch({
-        type: ADD_ORGANIZATION_FAIL,
-        payload: err.response ? err.response.data.detail : 'Network Error'
-      });
-      throw err; // Rethrow the error to propagate it further if needed
-    }
-  };
-  
-  // Get Organization by ID
-  export const getOrganizationById = id => async dispatch => {
-    dispatch({ type: GET_ORGANIZATION_REQUEST });
-  
-    try {
-      const token = localStorage.getItem('token');
-      const res = await axios.get(`${base_url}api/organizations/${id}/`, {
+export const addOrganization = ({ name, owner, description }) => async dispatch => {
+  dispatch({ type: ADD_ORGANIZATION_REQUEST });
+
+  try {
+    const token = localStorage.getItem('token');
+    const res = await axios.post(
+      `${base_url}api/organizations/`,
+      { name, owner, description },
+      {
         headers: {
           Authorization: `Bearer ${token}`
         }
-      });
-  
-      dispatch({
-        type: GET_ORGANIZATION_SUCCESS,
-        payload: res.data
-      });
-    } catch (err) {
-      dispatch({
-        type: GET_ORGANIZATION_FAIL,
-        payload: err.response ? err.response.data.detail : 'Network Error'
-      });
-    }
-  };
-  
+      }
+    );
 
-// Update Organization
-export const updateOrganization = (id, { name, description, members_emails }) => async dispatch => {
+    dispatch({
+      type: ADD_ORGANIZATION_SUCCESS,
+      payload: res.data
+    });
+
+    return res.data; // Return the new organization data if needed
+  } catch (err) {
+    dispatch({
+      type: ADD_ORGANIZATION_FAIL,
+      payload: err.response ? err.response.data.detail : 'Network Error'
+    });
+    throw err; // Rethrow the error to propagate it further if needed
+  }
+};
+
+// Update Organization (Add Members)
+export const updateOrganization = (id, { members }) => async dispatch => {
   dispatch({ type: UPDATE_ORGANIZATION_REQUEST });
 
   try {
     const token = localStorage.getItem('token');
-    const res = await axios.patch( // Changed from put to patch for partial updates
+    const res = await axios.patch(
       `${base_url}api/organizations/${id}/`,
-      { name, description, members_emails },
+      { members },
       {
         headers: {
           Authorization: `Bearer ${token}`
@@ -157,5 +132,29 @@ export const deleteOrganization = id => async dispatch => {
       payload: err.response ? err.response.data.detail : 'Network Error'
     });
     throw err; // Rethrow the error to propagate it further if needed
+  }
+};
+
+// Get Organization by ID
+export const getOrganizationById = id => async dispatch => {
+  dispatch({ type: GET_ORGANIZATION_REQUEST });
+
+  try {
+    const token = localStorage.getItem('token');
+    const res = await axios.get(`${base_url}api/organizations/${id}/`, {
+      headers: {
+        Authorization: `Bearer ${token}`
+      }
+    });
+
+    dispatch({
+      type: GET_ORGANIZATION_SUCCESS,
+      payload: res.data
+    });
+  } catch (err) {
+    dispatch({
+      type: GET_ORGANIZATION_FAIL,
+      payload: err.response ? err.response.data.detail : 'Network Error'
+    });
   }
 };

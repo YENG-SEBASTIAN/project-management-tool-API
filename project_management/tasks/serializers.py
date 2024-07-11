@@ -1,11 +1,11 @@
 from rest_framework import serializers
-from django.contrib.auth.models import User
+from accounts.models import User
 from .models import Organization, Project, Milestone, Task, TaskComment, File
 from .utils import send_organization_member_email
 
 class OrganizationSerializer(serializers.ModelSerializer):
     members = serializers.ListField(
-        child=serializers.EmailField(), write_only=True
+        child=serializers.EmailField(), write_only=True, required=False
     )
     members_display = serializers.SerializerMethodField()
 
@@ -54,6 +54,8 @@ class OrganizationSerializer(serializers.ModelSerializer):
                 pass
 
         return organization
+
+
 
 class ProjectSerializer(serializers.ModelSerializer):
     class Meta:

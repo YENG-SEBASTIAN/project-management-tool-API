@@ -18,6 +18,7 @@ import {
 
 const initialState = {
   organizations: [],
+  organization: null,
   loading: false,
   error: null
 };
@@ -44,7 +45,7 @@ const organizationReducer = (state = initialState, action) => {
       return {
         ...state,
         loading: false,
-        organizations: [action.payload]
+        organization: action.payload
       };
     case ADD_ORGANIZATION_SUCCESS:
       return {

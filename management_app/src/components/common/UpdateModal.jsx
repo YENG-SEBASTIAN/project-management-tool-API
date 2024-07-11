@@ -1,13 +1,23 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import Spinner from './Spinner';
 
 const UpdateModal = ({ onClose, organization, onUpdate }) => {
   const [formData, setFormData] = useState({
-    name: organization.name,
-    description: organization.description,
-    members_emails: organization.members_emails_display.join(', '),
+    name: '',
+    description: '',
+    members_emails: '',
   });
   const [loading, setLoading] = useState(false);
+
+  useEffect(() => {
+    if (organization) {
+      setFormData({
+        name: organization.name || '',
+        description: organization.description || '',
+        members_emails: organization.members_emails_display ? organization.members_emails_display.join(', ') : '',
+      });
+    }
+  }, [organization]);
 
   const handleChange = (e) => {
     setFormData({
