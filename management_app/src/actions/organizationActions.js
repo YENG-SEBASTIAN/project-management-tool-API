@@ -77,8 +77,40 @@ export const addOrganization = ({ name, owner, description }) => async dispatch 
   }
 };
 
-// Update Organization (Add Members)
-export const updateOrganization = (id, { members }) => async dispatch => {
+// Update Organization
+export const updateOrganization = (id, { name, description, members }) => async dispatch => {
+  dispatch({ type: UPDATE_ORGANIZATION_REQUEST });
+
+  try {
+    const token = localStorage.getItem('token');
+    const res = await axios.put(
+      `${base_url}api/organizations/${id}/`,
+      { name, description, members },
+      {
+        headers: {
+          Authorization: `Bearer ${token}`
+        }
+      }
+    );
+
+    dispatch({
+      type: UPDATE_ORGANIZATION_SUCCESS,
+      payload: res.data
+    });
+
+    return res.data; // Return the updated organization data if needed
+  } catch (err) {
+    const errorMessage = err.response ? err.response.data.detail : 'Network Error';
+    dispatch({
+      type: UPDATE_ORGANIZATION_FAIL,
+      payload: errorMessage.includes('does not exist') ? 'One or more email addresses are invalid.' : errorMessage
+    });
+    throw err; // Rethrow the error to propagate it further if needed
+  }
+};
+
+// Patch Organization (Add Members)
+export const patchOrganization = (id, { members }) => async dispatch => {
   dispatch({ type: UPDATE_ORGANIZATION_REQUEST });
 
   try {
@@ -100,9 +132,10 @@ export const updateOrganization = (id, { members }) => async dispatch => {
 
     return res.data; // Return the updated organization data if needed
   } catch (err) {
+    const errorMessage = err.response ? err.response.data.detail : 'Network Error';
     dispatch({
       type: UPDATE_ORGANIZATION_FAIL,
-      payload: err.response ? err.response.data.detail : 'Network Error'
+      payload: errorMessage.includes('does not exist') ? 'One or more email addresses are invalid.' : errorMessage
     });
     throw err; // Rethrow the error to propagate it further if needed
   }

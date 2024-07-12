@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import { useParams, useNavigate } from 'react-router-dom';
-import { getOrganizationById, deleteOrganization, updateOrganization } from '../../../actions/organizationActions';
+import { getOrganizationById, deleteOrganization, patchOrganization } from '../../../actions/organizationActions';
 import { AiOutlineDelete, AiOutlineEdit, AiOutlineUserAdd } from 'react-icons/ai';
 import Spinner from '../../common/Spinner';
 import Alert from '../../common/Alert';
@@ -12,11 +12,12 @@ import AddMemberModal from '../../common/AddMemberModal';
 const OrganizationDetail = () => {
   const { id } = useParams();
   const dispatch = useDispatch();
+  const navigate = useNavigate();
   const { organization, loading, error } = useSelector(state => state.organizations);
+
   const [showConfirmModal, setShowConfirmModal] = useState(false);
   const [showUpdateModal, setShowUpdateModal] = useState(false);
   const [showAddMemberModal, setShowAddMemberModal] = useState(false);
-  const navigate = useNavigate();
 
   useEffect(() => {
     dispatch(getOrganizationById(id));
@@ -28,9 +29,10 @@ const OrganizationDetail = () => {
   };
 
   const handleAddMembers = async (members) => {
-    const updatedData = { ...organization, members_emails: members };
-    await dispatch(updateOrganization(id, updatedData));
+    const updatedData = { members };
+    await dispatch(patchOrganization(id, updatedData));
     setShowAddMemberModal(false);
+    dispatch(getOrganizationById(id)); // Refresh the organization details
   };
 
   if (loading) {
@@ -50,22 +52,13 @@ const OrganizationDetail = () => {
       <div className="flex justify-between items-center">
         <h1 className="text-2xl font-bold mb-4">Org. Name: {organization.name}</h1>
         <div className="flex space-x-2">
-          <button
-            className="text-red-500"
-            onClick={() => setShowConfirmModal(true)}
-          >
+          <button className="text-red-500" onClick={() => setShowConfirmModal(true)}>
             <AiOutlineDelete size={24} />
           </button>
-          <button
-            className="text-blue-500"
-            onClick={() => setShowUpdateModal(true)}
-          >
+          <button className="text-blue-500" onClick={() => setShowUpdateModal(true)}>
             <AiOutlineEdit size={24} />
           </button>
-          <button
-            className="text-green-500"
-            onClick={() => setShowAddMemberModal(true)}
-          >
+          <button className="text-green-500" onClick={() => setShowAddMemberModal(true)}>
             <AiOutlineUserAdd size={24} />
           </button>
         </div>
@@ -101,7 +94,7 @@ const OrganizationDetail = () => {
         <UpdateModal
           onClose={() => setShowUpdateModal(false)}
           organization={organization}
-          onUpdate={(updatedData) => dispatch(updateOrganization(id, updatedData))}
+          onUpdate={(updatedData) => dispatch(patchOrganization(id, updatedData))}
         />
       )}
 

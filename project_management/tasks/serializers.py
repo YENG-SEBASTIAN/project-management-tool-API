@@ -44,7 +44,7 @@ class OrganizationSerializer(serializers.ModelSerializer):
         members_emails = validated_data.pop('members', [])
         organization = super().update(instance, validated_data)
 
-        organization.members.clear()
+        # organization.members.clear()
         for email in members_emails:
             try:
                 user = User.objects.get(email=email)
