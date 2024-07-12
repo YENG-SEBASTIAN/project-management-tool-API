@@ -33,7 +33,13 @@ const Project = () => {
   const handleAddNewProject = async (e) => {
     e.preventDefault();
     try {
-      await dispatch(addProject({ name: projectName, description: projectDescription, owner: user, organization: projectOrganization }));
+      const newProject = {
+        name: projectName,
+        description: projectDescription,
+        owner: user,
+        organization: projectOrganization
+      };
+      await dispatch(addProject(newProject));
       setSuccessMessage('Project added successfully.');
       setProjectName('');
       setProjectDescription('');
@@ -47,7 +53,14 @@ const Project = () => {
   const handleUpdateProject = async (e) => {
     e.preventDefault();
     try {
-      await dispatch(updateProject(selectedProject.id, { name: projectName, description: projectDescription, owner: selectedProject.owner, organization: projectOrganization }));
+      const updatedProject = {
+        id: selectedProject.id,
+        name: projectName,
+        description: projectDescription,
+        owner: selectedProject.owner,
+        organization: projectOrganization
+      };
+      await dispatch(updateProject(selectedProject.id, updatedProject));
       setSuccessMessage('Project updated successfully.');
       setProjectName('');
       setProjectDescription('');
@@ -68,18 +81,22 @@ const Project = () => {
     }
   };
 
-  const handleCardClick = (project) => {
+  const handleCardClick = (projectId) => {
+    const project = projects.find(proj => proj.id === projectId);
     setSelectedProject(project);
     setIsDetailModalOpen(true);
   };
 
   const openUpdateModal = (project) => {
     setSelectedProject(project);
-    setProjectName(project.name);
-    setProjectDescription(project.description);
-    setProjectOrganization(project.organization); // Assuming `project.organization` is the organization object
+    setProjectName(project.name || ''); // Ensure project.name is defined or set to empty string
+    setProjectDescription(project.description || ''); // Ensure project.description is defined or set to empty string
+    setProjectOrganization(project.organization?.id || ''); // Ensure project.organization.id is defined or set to empty string
     setIsUpdateModalOpen(true);
   };
+
+  // Filter organizations to only include those created by the user
+  const userOrganizations = organizations.filter(org => org.owner === user);
 
   return (
     <div className="p-4">
@@ -152,21 +169,23 @@ const Project = () => {
                   onChange={(e) => setProjectOrganization(e.target.value)}
                   required
                 >
-                  <option value="">Select an Organization</option>
-                  {organizations.map(org => (
-                    <option key={org.id} value={org.id}>{org.name}</option>
+                  <option value="">Select Organization</option>
+                  {userOrganizations.map(org => (
+                    <option key={org.id} value={org.id}>
+                      {org.name}
+                    </option>
                   ))}
                 </select>
               </div>
               <div className="flex justify-end">
                 <button
                   type="button"
-                  className="mr-4 py-2 px-4 bg-gray-300 rounded"
+                  className="bg-gray-400 text-white py-2 px-4 rounded mr-2"
                   onClick={() => setIsAddModalOpen(false)}
                 >
                   Cancel
                 </button>
-                <button type="submit" className="py-2 px-4 bg-orange-600 text-white rounded">
+                <button type="submit" className="bg-orange-600 text-white py-2 px-4 rounded">
                   Add Project
                 </button>
               </div>
@@ -211,21 +230,23 @@ const Project = () => {
                   onChange={(e) => setProjectOrganization(e.target.value)}
                   required
                 >
-                  <option value="">Select an Organization</option>
-                  {organizations.map(org => (
-                    <option key={org.id} value={org.id}>{org.name}</option>
+                  <option value="">Select Organization</option>
+                  {userOrganizations.map(org => (
+                    <option key={org.id} value={org.id}>
+                      {org.name}
+                    </option>
                   ))}
                 </select>
               </div>
               <div className="flex justify-end">
                 <button
                   type="button"
-                  className="mr-4 py-2 px-4 bg-gray-300 rounded"
+                  className="bg-gray-400 text-white py-2 px-4 rounded mr-2"
                   onClick={() => setIsUpdateModalOpen(false)}
                 >
                   Cancel
                 </button>
-                <button type="submit" className="py-2 px-4 bg-orange-600 text-white rounded">
+                <button type="submit" className="bg-orange-600 text-white py-2 px-4 rounded">
                   Update Project
                 </button>
               </div>
@@ -234,41 +255,38 @@ const Project = () => {
         </div>
       )}
 
-      {/* Detail Project Modal */}
-      {isDetailModalOpen && (
+      {/* Detail Modal */}
+      {isDetailModalOpen && selectedProject && (
         <div className="fixed inset-0 bg-black bg-opacity-50 flex justify-center items-center z-50">
           <div className="bg-white p-6 rounded shadow-lg w-full max-w-md">
             <h2 className="text-xl font-bold mb-4">Project Details</h2>
             <div className="mb-4">
               <label className="block text-gray-700 mb-2">Project Name</label>
-              <p className="w-full px-3 py-2 border rounded">{selectedProject.name}</p>
+              <p className="border p-2 rounded">{selectedProject.name}</p>
             </div>
             <div className="mb-4">
               <label className="block text-gray-700 mb-2">Description</label>
-              <p className="w-full px-3 py-2 border rounded">{selectedProject.description}</p>
+              <p className="border p-2 rounded">{selectedProject.description}</p>
             </div>
             <div className="mb-4">
               <label className="block text-gray-700 mb-2">Organization</label>
-              <p className="w-full px-3 py-2 border rounded">{selectedProject.organization}</p>
+              <p className="border p-2 rounded">{selectedProject.organization}</p>
             </div>
             <div className="flex justify-end">
               <button
-                type="button"
-                className="mr-4 py-2 px-4 bg-gray-300 rounded"
+                className="bg-gray-400 text-white py-2 px-4 rounded mr-2"
                 onClick={() => setIsDetailModalOpen(false)}
               >
                 Close
               </button>
               <button
-                type="button"
-                className="mr-4 py-2 px-4 bg-yellow-500 text-white rounded"
+                className="bg-orange-600 text-white py-2 px-4 rounded"
                 onClick={() => openUpdateModal(selectedProject)}
               >
                 Update
               </button>
               <button
-                type="button"
-                className="py-2 px-4 bg-red-600 text-white rounded"
+                className="bg-red-600 text-white py-2 px-4 rounded ml-2"
                 onClick={() => {
                   setIsDetailModalOpen(false);
                   setIsDeleteModalOpen(true);
@@ -281,23 +299,21 @@ const Project = () => {
         </div>
       )}
 
-      {/* Delete Project Modal */}
-      {isDeleteModalOpen && (
+      {/* Delete Modal */}
+      {isDeleteModalOpen && selectedProject && (
         <div className="fixed inset-0 bg-black bg-opacity-50 flex justify-center items-center z-50">
           <div className="bg-white p-6 rounded shadow-lg w-full max-w-md">
-            <h2 className="text-xl font-bold mb-4">Confirm Delete</h2>
-            <p className="mb-4">Are you sure you want to delete this project?</p>
-            <div className="flex justify-end">
+            <h2 className="text-xl font-bold mb-4">Delete Project</h2>
+            <p>Are you sure you want to delete the project "{selectedProject.name}"?</p>
+            <div className="flex justify-end mt-4">
               <button
-                type="button"
-                className="mr-4 py-2 px-4 bg-gray-300 rounded"
+                className="bg-gray-400 text-white py-2 px-4 rounded mr-2"
                 onClick={() => setIsDeleteModalOpen(false)}
               >
                 Cancel
               </button>
               <button
-                type="button"
-                className="py-2 px-4 bg-red-600 text-white rounded"
+                className="bg-red-600 text-white py-2 px-4 rounded"
                 onClick={handleDeleteProject}
               >
                 Delete

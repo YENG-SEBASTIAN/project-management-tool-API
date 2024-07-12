@@ -1,77 +1,65 @@
 import {
-  GET_ORGANIZATIONS_REQUEST,
-  GET_ORGANIZATIONS_SUCCESS,
-  GET_ORGANIZATIONS_FAIL,
-  GET_ORGANIZATION_REQUEST,
-  GET_ORGANIZATION_SUCCESS,
-  GET_ORGANIZATION_FAIL,
-  ADD_ORGANIZATION_REQUEST,
-  ADD_ORGANIZATION_SUCCESS,
-  ADD_ORGANIZATION_FAIL,
-  UPDATE_ORGANIZATION_REQUEST,
-  UPDATE_ORGANIZATION_SUCCESS,
-  UPDATE_ORGANIZATION_FAIL,
-  DELETE_ORGANIZATION_REQUEST,
-  DELETE_ORGANIZATION_SUCCESS,
-  DELETE_ORGANIZATION_FAIL
-} from '../actions/organizationActions';
+  GET_PROJECTS_REQUEST,
+  GET_PROJECTS_SUCCESS,
+  GET_PROJECTS_FAIL,
+  ADD_PROJECT_REQUEST,
+  ADD_PROJECT_SUCCESS,
+  ADD_PROJECT_FAIL,
+  UPDATE_PROJECT_REQUEST,
+  UPDATE_PROJECT_SUCCESS,
+  UPDATE_PROJECT_FAIL,
+  DELETE_PROJECT_REQUEST,
+  DELETE_PROJECT_SUCCESS,
+  DELETE_PROJECT_FAIL
+} from '../actions/projectActions';
 
 const initialState = {
-  organizations: [],
-  organization: null,
+  projects: [],
   loading: false,
   error: null
 };
 
-const organizationReducer = (state = initialState, action) => {
+const projectReducer = (state = initialState, action) => {
   switch (action.type) {
-    case GET_ORGANIZATIONS_REQUEST:
-    case GET_ORGANIZATION_REQUEST:
-    case ADD_ORGANIZATION_REQUEST:
-    case UPDATE_ORGANIZATION_REQUEST:
-    case DELETE_ORGANIZATION_REQUEST:
+    case GET_PROJECTS_REQUEST:
+    case ADD_PROJECT_REQUEST:
+    case UPDATE_PROJECT_REQUEST:
+    case DELETE_PROJECT_REQUEST:
       return {
         ...state,
         loading: true,
         error: null
       };
-    case GET_ORGANIZATIONS_SUCCESS:
+    case GET_PROJECTS_SUCCESS:
       return {
         ...state,
         loading: false,
-        organizations: action.payload
+        projects: action.payload
       };
-    case GET_ORGANIZATION_SUCCESS:
+    case ADD_PROJECT_SUCCESS:
       return {
         ...state,
         loading: false,
-        organization: action.payload
+        projects: [...state.projects, action.payload]
       };
-    case ADD_ORGANIZATION_SUCCESS:
+    case UPDATE_PROJECT_SUCCESS:
       return {
         ...state,
         loading: false,
-        organizations: [...state.organizations, action.payload]
-      };
-    case UPDATE_ORGANIZATION_SUCCESS:
-      return {
-        ...state,
-        loading: false,
-        organizations: state.organizations.map(organization =>
-          organization.id === action.payload.id ? action.payload : organization
+        projects: state.projects.map(project =>
+          project.id === action.payload.id ? action.payload : project
         )
       };
-    case DELETE_ORGANIZATION_SUCCESS:
+    case DELETE_PROJECT_SUCCESS:
       return {
         ...state,
         loading: false,
-        organizations: state.organizations.filter(organization => organization.id !== action.payload)
+        projects: state.projects.filter(project => project.id !== action.payload)
       };
-    case GET_ORGANIZATIONS_FAIL:
-    case GET_ORGANIZATION_FAIL:
-    case ADD_ORGANIZATION_FAIL:
-    case UPDATE_ORGANIZATION_FAIL:
-    case DELETE_ORGANIZATION_FAIL:
+    case GET_PROJECTS_FAIL:
+    case ADD_PROJECT_FAIL:
+    case UPDATE_PROJECT_FAIL:
+    case DELETE_PROJECT_FAIL:
       return {
         ...state,
         loading: false,
@@ -82,4 +70,4 @@ const organizationReducer = (state = initialState, action) => {
   }
 };
 
-export default organizationReducer;
+export default projectReducer;
