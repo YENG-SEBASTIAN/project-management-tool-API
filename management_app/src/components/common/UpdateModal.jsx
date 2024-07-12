@@ -14,7 +14,7 @@ const UpdateModal = ({ onClose, organization, onUpdate }) => {
       setFormData({
         name: organization.name || '',
         description: organization.description || '',
-        members_emails: organization.members_emails_display ? organization.members_emails_display.join(', ') : '',
+        members_emails: organization.members_display ? organization.members_display.join(', ') : '',
       });
     }
   }, [organization]);
