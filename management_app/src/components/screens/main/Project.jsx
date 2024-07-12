@@ -89,9 +89,9 @@ const Project = () => {
 
   const openUpdateModal = (project) => {
     setSelectedProject(project);
-    setProjectName(project.name || ''); // Ensure project.name is defined or set to empty string
-    setProjectDescription(project.description || ''); // Ensure project.description is defined or set to empty string
-    setProjectOrganization(project.organization?.id || ''); // Ensure project.organization.id is defined or set to empty string
+    setProjectName(project.name || '');
+    setProjectDescription(project.description || '');
+    setProjectOrganization(project.organization?.id || '');
     setIsUpdateModalOpen(true);
   };
 
@@ -270,7 +270,7 @@ const Project = () => {
             </div>
             <div className="mb-4">
               <label className="block text-gray-700 mb-2">Organization</label>
-              <p className="border p-2 rounded">{selectedProject.organization}</p>
+              <p className="border p-2 rounded">{selectedProject.organization.name}</p>
             </div>
             <div className="flex justify-end">
               <button
