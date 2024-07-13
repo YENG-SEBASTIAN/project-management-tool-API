@@ -93,6 +93,7 @@ const Milestone = () => {
       setIsEdit(true);
     }
   };
+  console.log(selectedMilestone)
 
   return (
     <div className="p-4">
@@ -143,7 +144,7 @@ const Milestone = () => {
                     <p><strong>Description:</strong> {selectedMilestone.description}</p>
                     <p><strong>Start Date:</strong> {selectedMilestone.start_date}</p>
                     <p><strong>Due Date:</strong> {selectedMilestone.due_date}</p>
-                    <p><strong>Project:</strong> {selectedMilestone.project.name}</p>
+                    <p><strong>Project:</strong> {selectedMilestone.project_name}</p>
                     <div className="flex mt-4">
                       {selectedMilestone.project.owner === user.id ? (
                         <>

@@ -32,6 +32,7 @@ class Milestone(models.Model):
     id = models.CharField(max_length=6, primary_key=True, default=generate_unique_id, editable=False, unique=True)
     name = models.CharField(max_length=100)
     description = models.TextField(blank=True, null=True)
+    start_date = models.DateField()
     due_date = models.DateField()
     project = models.ForeignKey(Project, related_name='milestones', on_delete=models.CASCADE)
     created_at = models.DateTimeField(auto_now_add=True)
