@@ -2,6 +2,8 @@ from rest_framework import serializers
 from accounts.models import User
 from tasks.utils import send_organization_member_email
 from tasks.models import Organization, Project, Milestone, Task, TaskComment, File
+from accounts.serializers import CustomUserSerializer
+
 
 class OrganizationSerializer(serializers.ModelSerializer):
     members = serializers.ListField(
@@ -56,13 +58,12 @@ class OrganizationSerializer(serializers.ModelSerializer):
 
 
 class ProjectSerializer(serializers.ModelSerializer):
+    owner = CustomUserSerializer()
     organization = OrganizationSerializer()
 
     class Meta:
         model = Project
         fields = ['id', 'name', 'description', 'owner', 'organization', 'created_at', 'updated_at']
-
-
 
 class MilestoneSerializer(serializers.ModelSerializer):
     class Meta:

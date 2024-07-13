@@ -12,6 +12,7 @@ const Project = () => {
   const dispatch = useDispatch();
   const { projects, loading: projectsLoading, error: projectsError } = useSelector(state => state.projects);
   const { organizations, loading: organizationsLoading, error: organizationsError } = useSelector(state => state.organizations);
+  const user = JSON.parse(localStorage.getItem('user'));
 
   const [isAddModalOpen, setIsAddModalOpen] = useState(false);
   const [isUpdateModalOpen, setIsUpdateModalOpen] = useState(false);
@@ -23,7 +24,6 @@ const Project = () => {
   const [projectName, setProjectName] = useState('');
   const [projectDescription, setProjectDescription] = useState('');
   const [projectOrganization, setProjectOrganization] = useState('');
-  const [user, setUser] = useState(JSON.parse(localStorage.getItem('user')).id);
 
   useEffect(() => {
     dispatch(getProjects());
@@ -36,7 +36,6 @@ const Project = () => {
       const newProject = {
         name: projectName,
         description: projectDescription,
-        owner: user,
         organization: projectOrganization
       };
       await dispatch(addProject(newProject));
@@ -57,7 +56,6 @@ const Project = () => {
         id: selectedProject.id,
         name: projectName,
         description: projectDescription,
-        owner: selectedProject.owner,
         organization: projectOrganization
       };
       await dispatch(updateProject(selectedProject.id, updatedProject));
@@ -91,12 +89,12 @@ const Project = () => {
     setSelectedProject(project);
     setProjectName(project.name || '');
     setProjectDescription(project.description || '');
-    setProjectOrganization(project.organization?.id || '');
+    setProjectOrganization(project.organization.id || '');
     setIsUpdateModalOpen(true);
   };
 
   // Filter organizations to only include those created by the user
-  const userOrganizations = organizations.filter(org => org.owner === user);
+  const userOrganizations = organizations.filter(org => org.owner === user.id);
 
   return (
     <div className="p-4">
@@ -180,7 +178,7 @@ const Project = () => {
               <div className="flex justify-end">
                 <button
                   type="button"
-                  className="bg-gray-400 text-white py-2 px-4 rounded mr-2"
+                  className="bg-gray-500 text-white py-2 px-4 rounded mr-2"
                   onClick={() => setIsAddModalOpen(false)}
                 >
                   Cancel
@@ -190,6 +188,50 @@ const Project = () => {
                 </button>
               </div>
             </form>
+          </div>
+        </div>
+      )}
+
+      {/* Project Details Modal */}
+      {isDetailModalOpen && (
+        <div className="fixed inset-0 bg-black bg-opacity-50 flex justify-center items-center z-50">
+          <div className="bg-white p-6 rounded shadow-lg w-full max-w-lg">
+            <h2 className="text-xl font-bold mb-4">Project Details</h2>
+            {selectedProject && (
+              <>
+                <p className="mb-4"><strong>Name:</strong> {selectedProject.name}</p>
+                <p className="mb-4"><strong>Description:</strong> {selectedProject.description}</p>
+                <p className="mb-4"><strong>Organization:</strong> {selectedProject.organization.name}</p>
+                <p className="mb-4"><strong>Owner:</strong> {selectedProject.owner.username}</p>
+                <p className="mb-4"><strong>Created At:</strong> {new Date(selectedProject.created_at).toLocaleString()}</p>
+                <p className="mb-4"><strong>Updated At:</strong> {new Date(selectedProject.updated_at).toLocaleString()}</p>
+                {selectedProject.owner.id === user.id && (
+                  <div className="flex justify-end">
+                    <button
+                      className="bg-blue-600 text-white py-2 px-4 rounded mr-2"
+                      onClick={() => openUpdateModal(selectedProject)}
+                    >
+                      Edit
+                    </button>
+                    <button
+                      className="bg-red-600 text-white py-2 px-4 rounded"
+                      onClick={() => setIsDeleteModalOpen(true)}
+                    >
+                      Delete
+                    </button>
+                  </div>
+                )}
+              </>
+            )}
+            <div className="flex justify-end mt-4">
+              <button
+                type="button"
+                className="bg-gray-500 text-white py-2 px-4 rounded"
+                onClick={() => setIsDetailModalOpen(false)}
+              >
+                Close
+              </button>
+            </div>
           </div>
         </div>
       )}
@@ -241,7 +283,7 @@ const Project = () => {
               <div className="flex justify-end">
                 <button
                   type="button"
-                  className="bg-gray-400 text-white py-2 px-4 rounded mr-2"
+                  className="bg-gray-500 text-white py-2 px-4 rounded mr-2"
                   onClick={() => setIsUpdateModalOpen(false)}
                 >
                   Cancel
@@ -255,64 +297,22 @@ const Project = () => {
         </div>
       )}
 
-      {/* Detail Modal */}
-      {isDetailModalOpen && selectedProject && (
-        <div className="fixed inset-0 bg-black bg-opacity-50 flex justify-center items-center z-50">
-          <div className="bg-white p-6 rounded shadow-lg w-full max-w-md">
-            <h2 className="text-xl font-bold mb-4">Project Details</h2>
-            <div className="mb-4">
-              <label className="block text-gray-700 mb-2">Project Name</label>
-              <p className="border p-2 rounded">{selectedProject.name}</p>
-            </div>
-            <div className="mb-4">
-              <label className="block text-gray-700 mb-2">Description</label>
-              <p className="border p-2 rounded">{selectedProject.description}</p>
-            </div>
-            <div className="mb-4">
-              <label className="block text-gray-700 mb-2">Organization</label>
-              <p className="border p-2 rounded">{selectedProject.organization.name}</p>
-            </div>
-            <div className="flex justify-end">
-              <button
-                className="bg-gray-400 text-white py-2 px-4 rounded mr-2"
-                onClick={() => setIsDetailModalOpen(false)}
-              >
-                Close
-              </button>
-              <button
-                className="bg-orange-600 text-white py-2 px-4 rounded"
-                onClick={() => openUpdateModal(selectedProject)}
-              >
-                Update
-              </button>
-              <button
-                className="bg-red-600 text-white py-2 px-4 rounded ml-2"
-                onClick={() => {
-                  setIsDetailModalOpen(false);
-                  setIsDeleteModalOpen(true);
-                }}
-              >
-                Delete
-              </button>
-            </div>
-          </div>
-        </div>
-      )}
-
-      {/* Delete Modal */}
-      {isDeleteModalOpen && selectedProject && (
+      {/* Delete Project Modal */}
+      {isDeleteModalOpen && (
         <div className="fixed inset-0 bg-black bg-opacity-50 flex justify-center items-center z-50">
           <div className="bg-white p-6 rounded shadow-lg w-full max-w-md">
             <h2 className="text-xl font-bold mb-4">Delete Project</h2>
-            <p>Are you sure you want to delete the project "{selectedProject.name}"?</p>
+            <p>Are you sure you want to delete this project?</p>
             <div className="flex justify-end mt-4">
               <button
-                className="bg-gray-400 text-white py-2 px-4 rounded mr-2"
+                type="button"
+                className="bg-gray-500 text-white py-2 px-4 rounded mr-2"
                 onClick={() => setIsDeleteModalOpen(false)}
               >
                 Cancel
               </button>
               <button
+                type="button"
                 className="bg-red-600 text-white py-2 px-4 rounded"
                 onClick={handleDeleteProject}
               >
