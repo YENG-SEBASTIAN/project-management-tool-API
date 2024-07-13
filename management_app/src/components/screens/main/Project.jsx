@@ -72,6 +72,7 @@ const Project = () => {
       setProjectDescription('');
       setProjectOrganization('');
       setIsUpdateModalOpen(false);
+      setIsDetailModalOpen(false);
     } catch (err) {
       setErrorMessage(err.response?.data?.detail || 'Failed to update project');
     }
@@ -81,7 +82,11 @@ const Project = () => {
     try {
       await dispatch(deleteProject(selectedProject.id));
       setSuccessMessage('Project deleted successfully.');
+      setProjectName('');
+      setProjectDescription('');
+      setProjectOrganization('');
       setIsDeleteModalOpen(false);
+      setIsDetailModalOpen(false);
     } catch (err) {
       setErrorMessage(err.response?.data?.detail || 'Failed to delete project');
     }
