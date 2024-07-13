@@ -26,7 +26,7 @@ const ItemList = ({ items, onItemClick, emptyMessage, itemKey, itemTitle, itemDe
             <div
               key={item[itemKey]}
               className="p-4 rounded shadow cursor-pointer"
-              style={{ backgroundColor: generateRandomColor() }}
+              style={{ backgroundColor: item.color || generateRandomColor() }}
               onClick={() => onItemClick(item[itemKey])}
             >
               <h2 className="text-xl font-bold">{item[itemTitle]}</h2>
