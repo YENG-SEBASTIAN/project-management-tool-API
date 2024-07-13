@@ -18,14 +18,11 @@ export const MILESTONE_DELETE_REQUEST = 'MILESTONE_DELETE_REQUEST';
 export const MILESTONE_DELETE_SUCCESS = 'MILESTONE_DELETE_SUCCESS';
 export const MILESTONE_DELETE_FAIL = 'MILESTONE_DELETE_FAIL';
 
-export const MILESTONE_PATCH_REQUEST = 'MILESTONE_PATCH_REQUEST';
-export const MILESTONE_PATCH_SUCCESS = 'MILESTONE_PATCH_SUCCESS';
-export const MILESTONE_PATCH_FAIL = 'MILESTONE_PATCH_FAIL';
-
 export const MILESTONE_DETAILS_REQUEST = 'MILESTONE_DETAILS_REQUEST';
 export const MILESTONE_DETAILS_SUCCESS = 'MILESTONE_DETAILS_SUCCESS';
 export const MILESTONE_DETAILS_FAIL = 'MILESTONE_DETAILS_FAIL';
 
+// Action Creators
 export const listMilestones = () => async (dispatch) => {
   try {
     dispatch({ type: MILESTONE_LIST_REQUEST });
@@ -78,25 +75,6 @@ export const updateMilestone = (id, milestone) => async (dispatch) => {
   } catch (error) {
     dispatch({
       type: MILESTONE_UPDATE_FAIL,
-      payload: error.response && error.response.data.detail ? error.response.data.detail : error.message
-    });
-  }
-};
-
-export const patchMilestone = (id, milestone) => async (dispatch) => {
-  try {
-    dispatch({ type: MILESTONE_PATCH_REQUEST });
-
-    const token = localStorage.getItem('token');
-    const { data } = await axios.patch(`${base_url}api/milestones/${id}/`, milestone, {
-      headers: {
-        Authorization: `Bearer ${token}`
-      }
-    });
-    dispatch({ type: MILESTONE_PATCH_SUCCESS, payload: data });
-  } catch (error) {
-    dispatch({
-      type: MILESTONE_PATCH_FAIL,
       payload: error.response && error.response.data.detail ? error.response.data.detail : error.message
     });
   }

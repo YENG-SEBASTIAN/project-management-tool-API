@@ -1,4 +1,5 @@
 from rest_framework import permissions
+from tasks.models import Project
 
 class IsOrganizationMemberOrOwner(permissions.BasePermission):
     """
@@ -6,7 +7,7 @@ class IsOrganizationMemberOrOwner(permissions.BasePermission):
     """
     def has_object_permission(self, request, view, obj):
         # Check if the user is the owner of the organization or project
-        if obj.owner == request.user:
+        if obj.project.owner == request.user:
             return True
 
         # Check if the user is a member of the organization related to the project or milestone
@@ -23,3 +24,33 @@ class IsTaskAssigneeOrMember(permissions.BasePermission):
 
         # Check if the user is a member of the organization related to the task's milestone
         return obj.milestone.project.organization.members.filter(id=request.user.id).exists()
+
+
+class IsMilestoneOwnerOrOrganizationMember(permissions.BasePermission):
+    """
+    Permission check for milestone operations.
+    Allows viewing details of milestones in projects the user owns or is a member of the organization.
+    Allows creating milestones only in projects the user owns.
+    Does not allow updating or deleting milestones in projects the user did not create.
+    """
+
+    def has_object_permission(self, request, view, obj):
+        # Check if the user is the owner of the project
+        if obj.project.owner == request.user:
+            return True
+
+        # Check if the user is a member of the organization related to the project
+        if obj.project.organization.members.filter(id=request.user.id).exists():
+            # Allow only GET (view) permissions for organization members
+            return request.method in permissions.SAFE_METHODS  # GET, HEAD, OPTIONS
+
+        return False
+
+    def has_permission(self, request, view):
+        # Allow creation of milestones only in projects the user owns
+        if request.method == 'POST':
+            project_id = request.data.get('project')
+            if project_id:
+                project = Project.objects.get(id=project_id)
+                return project.owner == request.user
+        return True

@@ -13,87 +13,71 @@ import {
   MILESTONE_DELETE_REQUEST,
   MILESTONE_DELETE_SUCCESS,
   MILESTONE_DELETE_FAIL,
-  MILESTONE_PATCH_REQUEST,
-  MILESTONE_PATCH_SUCCESS,
-  MILESTONE_PATCH_FAIL,
   MILESTONE_DETAILS_REQUEST,
   MILESTONE_DETAILS_SUCCESS,
   MILESTONE_DETAILS_FAIL,
 } from '../actions/milestoneActions';
 
-export const milestoneListReducer = (state = { milestones: [] }, action) => {
+export const milestoneListReducer = (state = { milestones: [], loading: false, error: null }, action) => {
   switch (action.type) {
     case MILESTONE_LIST_REQUEST:
-      return { loading: true, milestones: [] };
+      return { ...state, loading: true, milestones: [], error: null };
     case MILESTONE_LIST_SUCCESS:
-      return { loading: false, milestones: action.payload };
+      return { ...state, loading: false, milestones: action.payload, error: null };
     case MILESTONE_LIST_FAIL:
-      return { loading: false, error: action.payload };
+      return { ...state, loading: false, error: action.payload };
     default:
       return state;
   }
 };
 
-export const milestoneCreateReducer = (state = {}, action) => {
+export const milestoneCreateReducer = (state = { loading: false, success: false, milestone: null, error: null }, action) => {
   switch (action.type) {
     case MILESTONE_CREATE_REQUEST:
-      return { loading: true };
+      return { ...state, loading: true, success: false, milestone: null, error: null };
     case MILESTONE_CREATE_SUCCESS:
-      return { loading: false, success: true, milestone: action.payload };
+      return { ...state, loading: false, success: true, milestone: action.payload, error: null };
     case MILESTONE_CREATE_FAIL:
-      return { loading: false, error: action.payload };
+      return { ...state, loading: false, success: false, error: action.payload };
     default:
       return state;
   }
 };
 
-export const milestoneUpdateReducer = (state = { milestone: {} }, action) => {
+export const milestoneUpdateReducer = (state = { loading: false, success: false, milestone: null, error: null }, action) => {
   switch (action.type) {
     case MILESTONE_UPDATE_REQUEST:
-      return { loading: true };
+      return { ...state, loading: true, success: false, milestone: null, error: null };
     case MILESTONE_UPDATE_SUCCESS:
-      return { loading: false, success: true, milestone: action.payload };
+      return { ...state, loading: false, success: true, milestone: action.payload, error: null };
     case MILESTONE_UPDATE_FAIL:
-      return { loading: false, error: action.payload };
+      return { ...state, loading: false, success: false, error: action.payload };
     default:
       return state;
   }
 };
 
-export const milestoneDeleteReducer = (state = {}, action) => {
+export const milestoneDeleteReducer = (state = { loading: false, success: false, error: null }, action) => {
   switch (action.type) {
     case MILESTONE_DELETE_REQUEST:
-      return { loading: true };
+      return { ...state, loading: true, success: false, error: null };
     case MILESTONE_DELETE_SUCCESS:
-      return { loading: false, success: true };
+      return { ...state, loading: false, success: true, error: null };
     case MILESTONE_DELETE_FAIL:
-      return { loading: false, error: action.payload };
+      return { ...state, loading: false, success: false, error: action.payload };
     default:
       return state;
   }
 };
 
-export const milestonePatchReducer = (state = { milestone: {} }, action) => {
-  switch (action.type) {
-    case MILESTONE_PATCH_REQUEST:
-      return { loading: true };
-    case MILESTONE_PATCH_SUCCESS:
-      return { loading: false, success: true, milestone: action.payload };
-    case MILESTONE_PATCH_FAIL:
-      return { loading: false, error: action.payload };
-    default:
-      return state;
-  }
-};
-
-export const milestoneDetailsReducer = (state = { milestone: {} }, action) => {
+export const milestoneDetailsReducer = (state = { loading: false, milestone: null, error: null }, action) => {
   switch (action.type) {
     case MILESTONE_DETAILS_REQUEST:
-      return { loading: true };
+      return { ...state, loading: true, milestone: null, error: null };
     case MILESTONE_DETAILS_SUCCESS:
-      return { loading: false, milestone: action.payload };
+      return { ...state, loading: false, milestone: action.payload, error: null };
     case MILESTONE_DETAILS_FAIL:
-      return { loading: false, error: action.payload };
+      return { ...state, loading: false, milestone: null, error: action.payload };
     default:
       return state;
   }
@@ -104,8 +88,7 @@ const milestonesReducer = combineReducers({
   milestoneCreate: milestoneCreateReducer,
   milestoneUpdate: milestoneUpdateReducer,
   milestoneDelete: milestoneDeleteReducer,
-  milestonePatch: milestonePatchReducer,
-  milestoneDetail: milestoneDetailsReducer,
+  milestoneDetails: milestoneDetailsReducer,
 });
 
 export default milestonesReducer;
