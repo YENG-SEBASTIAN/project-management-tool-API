@@ -6,8 +6,9 @@ import {
   LOGIN_REQUEST,
   LOGIN_SUCCESS,
   LOGIN_FAIL,
-  LOGOUT
-} from '../actions/authActionTypes';
+  LOGOUT,
+  LOAD_USER
+} from '../actions/authActions';
 
 const initialRegisterState = {
   loading: false,
@@ -77,6 +78,11 @@ export const loginReducer = (state = initialLoginState, action) => {
         ...state,
         token: null,
         user: null
+      };
+    case LOAD_USER:
+      return {
+        ...state,
+        user: payload
       };
     default:
       return state;

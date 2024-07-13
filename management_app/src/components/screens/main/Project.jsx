@@ -2,11 +2,16 @@ import React, { useEffect, useState } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import { FiPlus } from 'react-icons/fi';
 import { AiOutlineSearch } from 'react-icons/ai';
-import { addProject, getProjects, deleteProject, updateProject } from '../../../actions/projectActions';
-import { getOrganizations } from '../../../actions/organizationActions';
 import Spinner from '../../common/Spinner';
 import Alert from '../../common/Alert';
 import ItemList from '../../common/ItemList';
+import {
+  addProject,
+  getProjects,
+  deleteProject,
+  updateProject
+} from '../../../actions/projectActions';
+import { getOrganizations } from '../../../actions/organizationActions';
 
 const Project = () => {
   const dispatch = useDispatch();
@@ -36,7 +41,8 @@ const Project = () => {
       const newProject = {
         name: projectName,
         description: projectDescription,
-        organization: projectOrganization
+        organization: projectOrganization,
+        owner: user.id,
       };
       await dispatch(addProject(newProject));
       setSuccessMessage('Project added successfully.');
@@ -45,9 +51,10 @@ const Project = () => {
       setProjectOrganization('');
       setIsAddModalOpen(false);
     } catch (err) {
-      setErrorMessage(err.message || 'Failed to add project');
+      setErrorMessage(err.response?.data?.detail || 'Failed to add project');
     }
   };
+  
 
   const handleUpdateProject = async (e) => {
     e.preventDefault();
@@ -56,7 +63,8 @@ const Project = () => {
         id: selectedProject.id,
         name: projectName,
         description: projectDescription,
-        organization: projectOrganization
+        organization: projectOrganization,
+        owner: user.id,
       };
       await dispatch(updateProject(selectedProject.id, updatedProject));
       setSuccessMessage('Project updated successfully.');
@@ -201,14 +209,14 @@ const Project = () => {
               <>
                 <p className="mb-4"><strong>Name:</strong> {selectedProject.name}</p>
                 <p className="mb-4"><strong>Description:</strong> {selectedProject.description}</p>
-                <p className="mb-4"><strong>Organization:</strong> {selectedProject.organization.name}</p>
-                <p className="mb-4"><strong>Owner:</strong> {selectedProject.owner.username}</p>
+                <p className="mb-4"><strong>Organization:</strong> {selectedProject.organization_name}</p>
+                <p className="mb-4"><strong>Owner:</strong> {selectedProject.owner === user.id ? user.username : ""}</p>
                 <p className="mb-4"><strong>Created At:</strong> {new Date(selectedProject.created_at).toLocaleString()}</p>
                 <p className="mb-4"><strong>Updated At:</strong> {new Date(selectedProject.updated_at).toLocaleString()}</p>
-                {selectedProject.owner.id === user.id && (
+                {selectedProject.owner === user.id && (
                   <div className="flex justify-end">
                     <button
-                      className="bg-blue-600 text-white py-2 px-4 rounded mr-2"
+                      className="bg-orange-600 text-white py-2 px-4 rounded mr-2"
                       onClick={() => openUpdateModal(selectedProject)}
                     >
                       Edit

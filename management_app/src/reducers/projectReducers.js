@@ -10,13 +10,13 @@ import {
   UPDATE_PROJECT_FAIL,
   DELETE_PROJECT_REQUEST,
   DELETE_PROJECT_SUCCESS,
-  DELETE_PROJECT_FAIL
+  DELETE_PROJECT_FAIL,
 } from '../actions/projectActions';
 
 const initialState = {
   projects: [],
   loading: false,
-  error: null
+  error: null,
 };
 
 const projectReducer = (state = initialState, action) => {
@@ -28,33 +28,33 @@ const projectReducer = (state = initialState, action) => {
       return {
         ...state,
         loading: true,
-        error: null
+        error: null,
       };
     case GET_PROJECTS_SUCCESS:
       return {
         ...state,
         loading: false,
-        projects: action.payload
+        projects: action.payload,
       };
     case ADD_PROJECT_SUCCESS:
       return {
         ...state,
         loading: false,
-        projects: [...state.projects, action.payload]
+        projects: [...state.projects, action.payload],
       };
     case UPDATE_PROJECT_SUCCESS:
       return {
         ...state,
         loading: false,
-        projects: state.projects.map(project =>
+        projects: state.projects.map((project) =>
           project.id === action.payload.id ? action.payload : project
-        )
+        ),
       };
     case DELETE_PROJECT_SUCCESS:
       return {
         ...state,
         loading: false,
-        projects: state.projects.filter(project => project.id !== action.payload)
+        projects: state.projects.filter((project) => project.id !== action.payload),
       };
     case GET_PROJECTS_FAIL:
     case ADD_PROJECT_FAIL:
@@ -63,7 +63,7 @@ const projectReducer = (state = initialState, action) => {
       return {
         ...state,
         loading: false,
-        error: action.payload
+        error: action.payload,
       };
     default:
       return state;

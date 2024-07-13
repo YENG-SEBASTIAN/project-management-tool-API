@@ -58,12 +58,13 @@ class OrganizationSerializer(serializers.ModelSerializer):
 
 
 class ProjectSerializer(serializers.ModelSerializer):
-    owner = CustomUserSerializer()
-    organization = OrganizationSerializer()
+    organization_name = serializers.CharField(source='organization.name', read_only=True)
 
     class Meta:
         model = Project
-        fields = ['id', 'name', 'description', 'owner', 'organization', 'created_at', 'updated_at']
+        fields = ['id', 'name', 'description', 'owner', 'organization', 'organization_name', 'created_at', 'updated_at']
+
+
 
 class MilestoneSerializer(serializers.ModelSerializer):
     class Meta:

@@ -1,7 +1,7 @@
 import axios from 'axios';
 import { base_url } from '../constants/constant';
 
-// Action Types
+// Action Types for Projects
 export const GET_PROJECTS_REQUEST = 'GET_PROJECTS_REQUEST';
 export const GET_PROJECTS_SUCCESS = 'GET_PROJECTS_SUCCESS';
 export const GET_PROJECTS_FAIL = 'GET_PROJECTS_FAIL';
@@ -19,31 +19,31 @@ export const DELETE_PROJECT_SUCCESS = 'DELETE_PROJECT_SUCCESS';
 export const DELETE_PROJECT_FAIL = 'DELETE_PROJECT_FAIL';
 
 // Get Projects
-export const getProjects = () => async dispatch => {
+export const getProjects = () => async (dispatch) => {
   dispatch({ type: GET_PROJECTS_REQUEST });
 
   try {
     const token = localStorage.getItem('token');
     const res = await axios.get(`${base_url}api/projects/`, {
       headers: {
-        Authorization: `Bearer ${token}`
-      }
+        Authorization: `Bearer ${token}`,
+      },
     });
 
     dispatch({
       type: GET_PROJECTS_SUCCESS,
-      payload: res.data
+      payload: res.data,
     });
   } catch (err) {
     dispatch({
       type: GET_PROJECTS_FAIL,
-      payload: err.response ? err.response.data.detail : 'Network Error'
+      payload: err.response ? err.response.data.detail : 'Network Error',
     });
   }
 };
 
 // Add Project
-export const addProject = (projectData) => async dispatch => {
+export const addProject = (projectData) => async (dispatch) => {
   dispatch({ type: ADD_PROJECT_REQUEST });
 
   try {
@@ -53,28 +53,28 @@ export const addProject = (projectData) => async dispatch => {
       projectData,
       {
         headers: {
-          Authorization: `Bearer ${token}`
-        }
+          Authorization: `Bearer ${token}`,
+        },
       }
     );
 
     dispatch({
       type: ADD_PROJECT_SUCCESS,
-      payload: res.data
+      payload: res.data,
     });
 
     return res.data; // Return the new project data if needed
   } catch (err) {
     dispatch({
       type: ADD_PROJECT_FAIL,
-      payload: err.response ? err.response.data.detail : 'Network Error'
+      payload: err.response ? err.response.data.detail : 'Network Error',
     });
     throw err; // Rethrow the error to propagate it further if needed
   }
 };
 
 // Update Project
-export const updateProject = (id, projectData) => async dispatch => {
+export const updateProject = (id, projectData) => async (dispatch) => {
   dispatch({ type: UPDATE_PROJECT_REQUEST });
 
   try {
@@ -84,48 +84,48 @@ export const updateProject = (id, projectData) => async dispatch => {
       projectData,
       {
         headers: {
-          Authorization: `Bearer ${token}`
-        }
+          Authorization: `Bearer ${token}`,
+        },
       }
     );
 
     dispatch({
       type: UPDATE_PROJECT_SUCCESS,
-      payload: res.data
+      payload: res.data,
     });
 
     return res.data; // Return the updated project data if needed
   } catch (err) {
     dispatch({
       type: UPDATE_PROJECT_FAIL,
-      payload: err.response ? err.response.data.detail : 'Network Error'
+      payload: err.response ? err.response.data.detail : 'Network Error',
     });
     throw err; // Rethrow the error to propagate it further if needed
   }
 };
 
 // Delete Project
-export const deleteProject = id => async dispatch => {
+export const deleteProject = (id) => async (dispatch) => {
   dispatch({ type: DELETE_PROJECT_REQUEST });
 
   try {
     const token = localStorage.getItem('token');
     await axios.delete(`${base_url}api/projects/${id}/`, {
       headers: {
-        Authorization: `Bearer ${token}`
-      }
+        Authorization: `Bearer ${token}`,
+      },
     });
 
     dispatch({
       type: DELETE_PROJECT_SUCCESS,
-      payload: id
+      payload: id,
     });
 
     return true; // Return true indicating successful deletion
   } catch (err) {
     dispatch({
       type: DELETE_PROJECT_FAIL,
-      payload: err.response ? err.response.data.detail : 'Network Error'
+      payload: err.response ? err.response.data.detail : 'Network Error',
     });
     throw err; // Rethrow the error to propagate it further if needed
   }
