@@ -59,7 +59,8 @@ class OrganizationSerializer(serializers.ModelSerializer):
 
 class ProjectSerializer(serializers.ModelSerializer):
     organization_name = serializers.CharField(source='organization.name', read_only=True)
-    organization_detail = OrganizationSerializer(read_only=True)
+    organization_detail = OrganizationSerializer(read_only=True, source='organization')
+
     class Meta:
         model = Project
         fields = ['id', 'name', 'description', 'owner', 'organization', 'organization_name', 'organization_detail', 'created_at', 'updated_at']

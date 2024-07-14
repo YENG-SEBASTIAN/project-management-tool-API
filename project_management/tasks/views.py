@@ -1,6 +1,8 @@
 from rest_framework import generics, permissions, status
 from rest_framework.response import Response
+from django.shortcuts import get_object_or_404
 from django.db import models
+from django.db.models import Q
 from accounts.models import User
 from tasks.models import Project, Milestone, Task, TaskComment, Organization
 from tasks.serializers import ProjectSerializer, MilestoneSerializer, TaskSerializer, TaskCommentSerializer, OrganizationSerializer
@@ -134,10 +136,21 @@ class TaskListCreateView(generics.ListCreateAPIView):
     permission_classes = [permissions.IsAuthenticated]
 
     def perform_create(self, serializer):
-        assignee = serializer.validated_data.get('assignee')
-        if assignee and not User.objects.filter(email=assignee.email).exists():
-            return Response({'error': 'Assignee email does not exist'}, status=status.HTTP_400_BAD_REQUEST)
-        task = serializer.save()
+        assignee_email = serializer.validated_data.get('assignee')
+        try:
+            assignee = User.objects.get(email=assignee_email)
+            print(assignee)
+        except User.DoesNotExist:
+            return Response({'error': 'Assignee with this email does not exist'}, status=status.HTTP_400_BAD_REQUEST)
+
+        # Check if assignee is a member of the organization
+        organization = serializer.validated_data['milestone'].project.organization
+        if not organization.members.filter(id=assignee.id).exists():
+            return Response({'error': 'Assignee is not a member of the organization'}, status=status.HTTP_400_BAD_REQUEST)
+
+        serializer.save(assignee=assignee.id)  # Save the assignee as User instance
+
+        task = serializer.instance
         if task.assignee:
             send_task_assignment_email(task)
 
@@ -146,20 +159,35 @@ class TaskListCreateView(generics.ListCreateAPIView):
         Get tasks where the user is the assignee or a member of the milestone's project's organization.
         """
         return Task.objects.filter(
-            models.Q(assignee=self.request.user) |
-            models.Q(milestone__project__organization__members__id=self.request.user.id)
+            Q(assignee=self.request.user) |
+            Q(milestone__project__organization__members=self.request.user)
         ).distinct()
 
-class TaskDetailView(generics.RetrieveUpdateAPIView):  # Allow only read and update, not delete
+class TaskDetailView(generics.RetrieveUpdateAPIView):
     queryset = Task.objects.all()
     serializer_class = TaskSerializer
     permission_classes = [permissions.IsAuthenticated, IsTaskAssigneeOrMember]
 
     def perform_update(self, serializer):
-        assignee = serializer.validated_data.get('assignee')
-        if assignee and not User.objects.filter(email=assignee.email).exists():
-            return Response({'error': 'Assignee email does not exist'}, status=status.HTTP_400_BAD_REQUEST)
-        serializer.save()
+        assignee_email = serializer.validated_data.get('assignee')
+        if assignee_email:
+            assignee = get_object_or_404(User, email=assignee_email)
+
+            # Check if assignee is a member of the organization
+            organization = serializer.instance.milestone.project.organization
+            if not organization.members.filter(id=assignee.id).exists():
+                return Response({'error': 'Assignee is not a member of the organization'}, status=status.HTTP_400_BAD_REQUEST)
+
+        serializer.save(assignee=assignee)
+
+    def get_object(self):
+        queryset = self.filter_queryset(self.get_queryset())
+        obj = queryset.get(pk=self.kwargs['pk'])
+
+        # Check object permissions against request user
+        self.check_object_permissions(self.request, obj)
+
+        return obj
 
 class TaskCommentListCreateView(generics.ListCreateAPIView):
     queryset = TaskComment.objects.all()

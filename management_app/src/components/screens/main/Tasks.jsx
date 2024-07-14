@@ -13,15 +13,16 @@ const Tasks = () => {
   const dispatch = useDispatch();
   const { tasks, loading: tasksLoading, error: tasksError } = useSelector(state => state.tasks.taskList);
   const { milestones } = useSelector(state => state.milestones.milestoneList);
-  const { organizationMembers } = useSelector(state => state.organizations);
 
   const [isAddModalOpen, setIsAddModalOpen] = useState(false);
   const [successMessage, setSuccessMessage] = useState('');
   const [errorMessage, setErrorMessage] = useState('');
+  const [formErrors, setFormErrors] = useState({});
   const [taskName, setTaskName] = useState('');
   const [taskDescription, setTaskDescription] = useState('');
   const [taskMilestone, setTaskMilestone] = useState('');
   const [taskAssignee, setTaskAssignee] = useState('');
+  const [taskStartDate, setTaskStartDate] = useState('');
   const [taskDueDate, setTaskDueDate] = useState('');
   const [taskFile, setTaskFile] = useState(null);
 
@@ -33,11 +34,13 @@ const Tasks = () => {
 
   const handleAddNewTask = async (e) => {
     e.preventDefault();
+    setFormErrors({});
     const formData = new FormData();
     formData.append('name', taskName);
     formData.append('description', taskDescription);
     formData.append('milestone', taskMilestone);
     formData.append('assignee', taskAssignee);
+    formData.append('start_date', taskStartDate);
     formData.append('due_date', taskDueDate);
     if (taskFile) {
       formData.append('file', taskFile);
@@ -50,12 +53,27 @@ const Tasks = () => {
       setTaskDescription('');
       setTaskMilestone('');
       setTaskAssignee('');
+      setTaskStartDate('');
       setTaskDueDate('');
       setTaskFile(null);
       setIsAddModalOpen(false);
     } catch (err) {
-      setErrorMessage(err.message || 'Failed to create task.');
+      if (err.response && err.response.status === 400) {
+        setFormErrors(err.response.data);
+      } else {
+        setErrorMessage(err.message || 'Failed to create task.');
+      }
     }
+  };
+
+  const getAssigneeOptions = () => {
+    const assigneeEmails = new Set();
+    milestones.forEach(milestone => {
+      milestone.project.organization_detail.members_display.forEach(email => {
+        assigneeEmails.add(email);
+      });
+    });
+    return Array.from(assigneeEmails);
   };
 
   return (
@@ -94,8 +112,8 @@ const Tasks = () => {
 
       {/* Add New Task Modal */}
       {isAddModalOpen && (
-        <div className="fixed inset-0 bg-black bg-opacity-50 flex justify-center items-center z-50">
-          <div className="bg-white p-6 rounded shadow-lg w-full max-w-md">
+        <div className="fixed inset-0 bg-black bg-opacity-50 flex justify-center items-center z-50 overflow-y-auto">
+          <div className="bg-white p-6 rounded shadow-lg w-full max-w-md overflow-y-auto max-h-screen">
             <h2 className="text-xl font-bold mb-4">Add New Task</h2>
             <form onSubmit={handleAddNewTask}>
               <div className="mb-4">
@@ -108,6 +126,7 @@ const Tasks = () => {
                   onChange={(e) => setTaskName(e.target.value)}
                   required
                 />
+                {formErrors.name && <p className="text-red-500 text-sm">{formErrors.name}</p>}
               </div>
               <div className="mb-4">
                 <label className="block text-gray-700 mb-2">Description</label>
@@ -118,6 +137,7 @@ const Tasks = () => {
                   onChange={(e) => setTaskDescription(e.target.value)}
                   required
                 />
+                {formErrors.description && <p className="text-red-500 text-sm">{formErrors.description}</p>}
               </div>
               <div className="mb-4">
                 <label className="block text-gray-700 mb-2">Milestone</label>
@@ -133,10 +153,11 @@ const Tasks = () => {
                     <option key={m.id} value={m.id}>{m.name}</option>
                   ))}
                 </select>
+                {formErrors.milestone && <p className="text-red-500 text-sm">{formErrors.milestone}</p>}
               </div>
               <div className="mb-4">
                 <label className="block text-gray-700 mb-2">Assignee</label>
-                {/* <select
+                <select
                   name="taskAssignee"
                   className="w-full px-3 py-2 border rounded"
                   value={taskAssignee}
@@ -144,10 +165,23 @@ const Tasks = () => {
                   required
                 >
                   <option value="">Select Assignee</option>
-                  {organizationMembers.map(member => (
-                    <option key={member.id} value={member.id}>{member.email}</option>
+                  {getAssigneeOptions().map(email => (
+                    <option key={email} value={email}>{email}</option>
                   ))}
-                </select> */}
+                </select>
+                {formErrors.assignee && <p className="text-red-500 text-sm">{formErrors.assignee}</p>}
+              </div>
+              <div className="mb-4">
+                <label className="block text-gray-700 mb-2">Start Date</label>
+                <input
+                  type="date"
+                  name="taskStartDate"
+                  className="w-full px-3 py-2 border rounded"
+                  value={taskStartDate}
+                  onChange={(e) => setTaskStartDate(e.target.value)}
+                  required
+                />
+                {formErrors.start_date && <p className="text-red-500 text-sm">{formErrors.start_date}</p>}
               </div>
               <div className="mb-4">
                 <label className="block text-gray-700 mb-2">Due Date</label>
@@ -159,6 +193,7 @@ const Tasks = () => {
                   onChange={(e) => setTaskDueDate(e.target.value)}
                   required
                 />
+                {formErrors.due_date && <p className="text-red-500 text-sm">{formErrors.due_date}</p>}
               </div>
               <div className="mb-4">
                 <label className="block text-gray-700 mb-2">File</label>
@@ -168,13 +203,10 @@ const Tasks = () => {
                   className="w-full px-3 py-2 border rounded"
                   onChange={(e) => setTaskFile(e.target.files[0])}
                 />
+                {formErrors.file && <p className="text-red-500 text-sm">{formErrors.file}</p>}
               </div>
               <div className="flex justify-end">
-                <button
-                  type="button"
-                  className="mr-4 py-2 px-4 bg-gray-300 rounded"
-                  onClick={() => setIsAddModalOpen(false)}
-                >
+                <button type="button" onClick={() => setIsAddModalOpen(false)} className="mr-4 py-2 px-4 bg-gray-500 text-white rounded">
                   Cancel
                 </button>
                 <button type="submit" className="py-2 px-4 bg-orange-600 text-white rounded">

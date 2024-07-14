@@ -78,13 +78,16 @@ export const createTask = (taskData) => async (dispatch) => {
       }
     });
     dispatch({ type: TASK_CREATE_SUCCESS, payload: data });
+    return data; // Return the response data for further handling
   } catch (error) {
     dispatch({
       type: TASK_CREATE_FAIL,
-      payload: error.response && error.response.data.detail ? error.response.data.detail : error.message
+      payload: error.response && error.response.data ? error.response.data : error.message
     });
+    throw error; // Throw the error to be caught in the component
   }
 };
+
 
 // Update Task (PUT)
 export const updateTask = (id, taskData) => async (dispatch) => {
