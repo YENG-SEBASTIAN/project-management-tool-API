@@ -3,6 +3,8 @@ import { useDispatch, useSelector } from 'react-redux';
 import { FiPlus } from 'react-icons/fi';
 import { AiOutlineSearch } from 'react-icons/ai';
 import { listTasks, createTask } from '../../../actions/taskActions';
+import { listMilestones } from '../../../actions/milestoneActions';
+import { getOrganizations } from '../../../actions/organizationActions';
 import Spinner from '../../common/Spinner';
 import Alert from '../../common/Alert';
 import ItemList from '../../common/ItemList';
@@ -11,6 +13,7 @@ const Tasks = () => {
   const dispatch = useDispatch();
   const { tasks, loading: tasksLoading, error: tasksError } = useSelector(state => state.tasks.taskList);
   const { milestones } = useSelector(state => state.milestones.milestoneList);
+  const { organizationMembers } = useSelector(state => state.organizations);
 
   const [isAddModalOpen, setIsAddModalOpen] = useState(false);
   const [successMessage, setSuccessMessage] = useState('');
@@ -19,21 +22,36 @@ const Tasks = () => {
   const [taskDescription, setTaskDescription] = useState('');
   const [taskMilestone, setTaskMilestone] = useState('');
   const [taskAssignee, setTaskAssignee] = useState('');
-  const [user, setUser] = useState(JSON.parse(localStorage.getItem('user')).id);
+  const [taskDueDate, setTaskDueDate] = useState('');
+  const [taskFile, setTaskFile] = useState(null);
 
   useEffect(() => {
     dispatch(listTasks());
+    dispatch(listMilestones());
+    dispatch(getOrganizations());
   }, [dispatch]);
 
   const handleAddNewTask = async (e) => {
     e.preventDefault();
+    const formData = new FormData();
+    formData.append('name', taskName);
+    formData.append('description', taskDescription);
+    formData.append('milestone', taskMilestone);
+    formData.append('assignee', taskAssignee);
+    formData.append('due_date', taskDueDate);
+    if (taskFile) {
+      formData.append('file', taskFile);
+    }
+
     try {
-      await dispatch(createTask({ name: taskName, description: taskDescription, milestone: taskMilestone, assignee: taskAssignee }));
+      await dispatch(createTask(formData));
       setSuccessMessage('Task created successfully.');
       setTaskName('');
       setTaskDescription('');
       setTaskMilestone('');
       setTaskAssignee('');
+      setTaskDueDate('');
+      setTaskFile(null);
       setIsAddModalOpen(false);
     } catch (err) {
       setErrorMessage(err.message || 'Failed to create task.');
@@ -118,13 +136,37 @@ const Tasks = () => {
               </div>
               <div className="mb-4">
                 <label className="block text-gray-700 mb-2">Assignee</label>
-                <input
-                  type="email" // Assuming assignee is an email
+                {/* <select
                   name="taskAssignee"
                   className="w-full px-3 py-2 border rounded"
                   value={taskAssignee}
                   onChange={(e) => setTaskAssignee(e.target.value)}
                   required
+                >
+                  <option value="">Select Assignee</option>
+                  {organizationMembers.map(member => (
+                    <option key={member.id} value={member.id}>{member.email}</option>
+                  ))}
+                </select> */}
+              </div>
+              <div className="mb-4">
+                <label className="block text-gray-700 mb-2">Due Date</label>
+                <input
+                  type="date"
+                  name="taskDueDate"
+                  className="w-full px-3 py-2 border rounded"
+                  value={taskDueDate}
+                  onChange={(e) => setTaskDueDate(e.target.value)}
+                  required
+                />
+              </div>
+              <div className="mb-4">
+                <label className="block text-gray-700 mb-2">File</label>
+                <input
+                  type="file"
+                  name="taskFile"
+                  className="w-full px-3 py-2 border rounded"
+                  onChange={(e) => setTaskFile(e.target.files[0])}
                 />
               </div>
               <div className="flex justify-end">
