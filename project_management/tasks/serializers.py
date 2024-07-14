@@ -68,6 +68,7 @@ class ProjectSerializer(serializers.ModelSerializer):
 
 class MilestoneSerializer(serializers.ModelSerializer):
     project_name = serializers.CharField(source='project.name', read_only=True)
+    project = ProjectSerializer(read_only=True)
 
     class Meta:
         model = Milestone
