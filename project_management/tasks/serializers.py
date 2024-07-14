@@ -77,9 +77,10 @@ class MilestoneSerializer(serializers.ModelSerializer):
 
 
 class TaskSerializer(serializers.ModelSerializer):
+    milestone_details = MilestoneSerializer(read_only=True)
     class Meta:
         model = Task
-        fields = ['id', 'name', 'description', 'file', 'due_date', 'milestone', 'assignee', 'completed', 'created_at', 'updated_at']
+        fields = ['id', 'name', 'description', 'file', 'start_date', 'due_date', 'milestone', 'milestone_details', 'assignee', 'completed', 'created_at', 'updated_at']
 
 class TaskCommentSerializer(serializers.ModelSerializer):
     class Meta:

@@ -18,6 +18,10 @@ export const TASK_UPDATE_REQUEST = 'TASK_UPDATE_REQUEST';
 export const TASK_UPDATE_SUCCESS = 'TASK_UPDATE_SUCCESS';
 export const TASK_UPDATE_FAIL = 'TASK_UPDATE_FAIL';
 
+export const TASK_UPDATE_PARTIAL_REQUEST = 'TASK_UPDATE_PARTIAL_REQUEST';
+export const TASK_UPDATE_PARTIAL_SUCCESS = 'TASK_UPDATE_PARTIAL_SUCCESS';
+export const TASK_UPDATE_PARTIAL_FAIL = 'TASK_UPDATE_PARTIAL_FAIL';
+
 export const TASK_DELETE_REQUEST = 'TASK_DELETE_REQUEST';
 export const TASK_DELETE_SUCCESS = 'TASK_DELETE_SUCCESS';
 export const TASK_DELETE_FAIL = 'TASK_DELETE_FAIL';
@@ -105,7 +109,7 @@ export const updateTask = (id, taskData) => async (dispatch) => {
 // Update Task (PATCH)
 export const updateTaskPartial = (id, taskData) => async (dispatch) => {
   try {
-    dispatch({ type: TASK_UPDATE_REQUEST });
+    dispatch({ type: TASK_UPDATE_PARTIAL_REQUEST });
 
     const token = localStorage.getItem('token');
     const { data } = await axios.patch(`${base_url}api/tasks/${id}/`, taskData, {
@@ -113,10 +117,10 @@ export const updateTaskPartial = (id, taskData) => async (dispatch) => {
         Authorization: `Bearer ${token}`
       }
     });
-    dispatch({ type: TASK_UPDATE_SUCCESS, payload: data });
+    dispatch({ type: TASK_UPDATE_PARTIAL_SUCCESS, payload: data });
   } catch (error) {
     dispatch({
-      type: TASK_UPDATE_FAIL,
+      type: TASK_UPDATE_PARTIAL_FAIL,
       payload: error.response && error.response.data.detail ? error.response.data.detail : error.message
     });
   }
