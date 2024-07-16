@@ -7,7 +7,7 @@ class IsOrganizationMemberOrOwner(permissions.BasePermission):
     """
     def has_object_permission(self, request, view, obj):
         # Check if the user is the owner of the organization or project
-        if obj.project.owner == request.user:
+        if obj.owner == request.user:
             return True
 
         # Check if the user is a member of the organization related to the project or milestone

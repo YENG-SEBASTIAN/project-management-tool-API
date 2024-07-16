@@ -5,6 +5,7 @@ import { login } from '../../actions/authActions';
 import { FaEye, FaEyeSlash } from 'react-icons/fa';
 import { ClipLoader } from 'react-spinners';
 import withAuthRedirect from './withAuthRedirect';
+import bg1 from '../../assets/personal-project-management.png';
 
 const Login = () => {
   const [email, setEmail] = useState('');
@@ -57,67 +58,79 @@ const Login = () => {
   }, [error, successMsg]);
 
   return (
-    <div className="min-h-screen flex items-center justify-center bg-orange-900 p-4">
-      <div className="bg-white p-8 rounded-lg shadow-lg w-full max-w-md">
-        <h1 className="text-3xl font-bold mb-6 text-center">Management Tool</h1>
-        <h2 className="text-2xl font-bold mb-4 text-center">Login</h2>
-        {error && <p className="text-red-500 text-center mb-4">{error}</p>}
-        {successMsg && <p className="text-green-500 text-center mb-4">{successMsg}</p>}
-        <form onSubmit={handleSubmit}>
-          <div className="mb-4">
-            <label className="block text-gray-700 text-sm font-bold mb-2" htmlFor="email">
-              Email
-            </label>
-            <input
-              type="email"
-              id="email"
-              placeholder="Enter your email"
-              className="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline"
-              value={email}
-              onChange={(e) => setEmail(e.target.value)}
-              required
-            />
+    <div className="min-h-screen flex">
+      <div className="hidden md:block relative w-3/4 bg-cover bg-center" style={{ backgroundImage: `url(${bg1})` }}>
+        <div className="absolute inset-0 bg-orange-600 opacity-25"></div>
+        <div className="flex flex-col justify-center items-center text-white absolute inset-0 px-10">
+          <h1 className="text-4xl font-bold mb-4 text-center text-black">Project Management Tool</h1>
+          <div className="text-lg text-center">
+            <p className='text-black'>Efficiently manage projects and tasks</p>
+            <p className='text-black'>Track milestones and progress</p>
+            <p className='text-black'>Collaborate with team members effectively</p>
           </div>
-          <div className="mb-6 relative">
-            <label className="block text-gray-700 text-sm font-bold mb-2" htmlFor="password">
-              Password
-            </label>
-            <input
-              type={showPassword ? 'text' : 'password'}
-              id="password"
-              placeholder="Enter your password"
-              className="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline pr-10"
-              value={password}
-              onChange={(e) => setPassword(e.target.value)}
-              required
-            />
-            <button
-              type="button"
-              onClick={togglePasswordVisibility}
-              className="absolute inset-y-0 mt-5 right-0 pr-3 flex items-center text-gray-600"
-            >
-              {showPassword ? <FaEyeSlash className="h-5 w-5" /> : <FaEye className="h-5 w-5" />}
-            </button>
-          </div>
-          <div className="flex items-center justify-center mb-4">
-            <button
-              type="submit"
-              className="bg-orange-600 hover:bg-orange-600 text-white font-bold py-2 px-4 rounded focus:outline-none focus:shadow-outline flex items-center"
-              disabled={loading}
-            >
-              {loading ? (
-                <ClipLoader color="#ffffff" size={24} />
-              ) : (
-                'Login'
-              )}
-            </button>
-          </div>
-          <div className="text-center">
-            <Link to="/register" className="text-blue-500 hover:underline">
-              Don't have an account? Register Now
-            </Link>
-          </div>
-        </form>
+        </div>
+      </div>
+      <div className="flex items-center justify-center w-full md:w-1/2 bg-orange-900 p-4">
+        <div className="bg-white p-8 rounded-lg shadow-lg w-full max-w-md">
+          <h2 className="text-2xl font-bold mb-4 text-center">Login</h2>
+          {error && <p className="text-red-500 text-center mb-4">{error}</p>}
+          {successMsg && <p className="text-green-500 text-center mb-4">{successMsg}</p>}
+          <form onSubmit={handleSubmit}>
+            <div className="mb-4">
+              <label className="block text-gray-700 text-sm font-bold mb-2" htmlFor="email">
+                Email
+              </label>
+              <input
+                type="email"
+                id="email"
+                placeholder="Enter your email"
+                className="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline"
+                value={email}
+                onChange={(e) => setEmail(e.target.value)}
+                required
+              />
+            </div>
+            <div className="mb-6 relative">
+              <label className="block text-gray-700 text-sm font-bold mb-2" htmlFor="password">
+                Password
+              </label>
+              <input
+                type={showPassword ? 'text' : 'password'}
+                id="password"
+                placeholder="Enter your password"
+                className="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline pr-10"
+                value={password}
+                onChange={(e) => setPassword(e.target.value)}
+                required
+              />
+              <button
+                type="button"
+                onClick={togglePasswordVisibility}
+                className="absolute inset-y-0 mt-5 right-0 pr-3 flex items-center text-gray-600"
+              >
+                {showPassword ? <FaEyeSlash className="h-5 w-5" /> : <FaEye className="h-5 w-5" />}
+              </button>
+            </div>
+            <div className="flex items-center justify-center mb-4">
+              <button
+                type="submit"
+                className="bg-orange-600 hover:bg-orange-600 text-white font-bold py-2 px-4 rounded focus:outline-none focus:shadow-outline flex items-center"
+                disabled={loading}
+              >
+                {loading ? (
+                  <ClipLoader color="#ffffff" size={24} />
+                ) : (
+                  'Login'
+                )}
+              </button>
+            </div>
+            <div className="text-center">
+              <Link to="/register" className="text-blue-500 hover:underline">
+                Don't have an account? Register Now
+              </Link>
+            </div>
+          </form>
+        </div>
       </div>
     </div>
   );
