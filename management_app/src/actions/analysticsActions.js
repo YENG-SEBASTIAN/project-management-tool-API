@@ -15,7 +15,12 @@ export const fetchMilestones = () => async (dispatch) => {
   try {
     dispatch({ type: FETCH_MILESTONES_REQUEST });
 
-    const response = await axios.get(`${base_url}milestones/`);
+    const token = localStorage.getItem('token');
+    const response = await axios.get(`${base_url}api/analystics/`, {
+        headers: {
+          Authorization: `Bearer ${token}`
+        }
+      });
     dispatch({
       type: FETCH_MILESTONES_SUCCESS,
       payload: response.data
@@ -35,7 +40,12 @@ export const fetchTaskProgress = (milestoneId) => async (dispatch) => {
   try {
     dispatch({ type: FETCH_TASK_PROGRESS_REQUEST });
 
-    const response = await axios.get(`${base_url}milestones/${milestoneId}/progress/`);
+    const token = localStorage.getItem('token');
+    const response = await axios.get(`${base_url}api/analystics/${milestoneId}/progress/`, {
+        headers: {
+          Authorization: `Bearer ${token}`
+        }
+      });
     dispatch({
       type: FETCH_TASK_PROGRESS_SUCCESS,
       payload: response.data

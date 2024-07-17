@@ -214,7 +214,7 @@ class TaskCommentListCreateView(generics.ListCreateAPIView):
 class TaskCommentDetailView(generics.RetrieveUpdateDestroyAPIView):
     queryset = TaskComment.objects.all()
     serializer_class = TaskCommentSerializer
-    permission_classes = [permissions.IsAuthenticated, IsTaskAssigneeOrMember]
+    # permission_classes = [permissions.IsAuthenticated, IsTaskAssigneeOrMember]
 
 
 
