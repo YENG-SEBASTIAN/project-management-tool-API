@@ -5,6 +5,7 @@ from tasks.models import Organization, Project, Milestone, Task, TaskComment, Fi
 from accounts.serializers import CustomUserSerializer
 
 
+
 class OrganizationSerializer(serializers.ModelSerializer):
     members = serializers.ListField(
         child=serializers.EmailField(), write_only=True, required=False
@@ -23,38 +24,54 @@ class OrganizationSerializer(serializers.ModelSerializer):
         request = self.context.get('request')
         user = request.user
 
+        # Ensure only the owner can modify organization members
         if 'members' in data and self.instance and user != self.instance.owner:
             raise serializers.ValidationError("Only the owner can modify organization members.")
 
         return data
 
     def create(self, validated_data):
+        request = self.context.get('request')
+        user = request.user
+
         members_emails = validated_data.pop('members', [])
         organization = Organization.objects.create(**validated_data)
 
-        for email in members_emails:
-            try:
-                user = User.objects.get(email=email)
-                organization.members.add(user)
-                send_organization_member_email(email, organization, self.context['request'])
-            except User.DoesNotExist:
-                pass
+        # Add members to the organization
+        if user == organization.owner:  # Only allow owner to add members
+            for email in members_emails:
+                try:
+                    user = User.objects.get(email=email)
+                    organization.members.add(user)
+                    send_organization_member_email(email, organization, request)
+                except User.DoesNotExist:
+                    pass
 
         return organization
 
     def update(self, instance, validated_data):
+        request = self.context.get('request')
+        user = request.user
+
         members_emails = validated_data.pop('members', [])
         organization = super().update(instance, validated_data)
 
-        for email in members_emails:
-            try:
-                user = User.objects.get(email=email)
-                organization.members.add(user)
-                send_organization_member_email(email, organization, self.context['request'])
-            except User.DoesNotExist:
-                pass
+        # Update members of the organization
+        if user == organization.owner:  # Only allow owner to update members
+            for email in members_emails:
+                try:
+                    user = User.objects.get(email=email)
+                    if user != organization.owner:  # Ensure owner cannot be removed as member
+                        if user in organization.members.all():
+                            organization.members.remove(user)
+                        else:
+                            organization.members.add(user)
+                        send_organization_member_email(email, organization, request)
+                except User.DoesNotExist:
+                    pass
 
         return organization
+
 
 
 class ProjectSerializer(serializers.ModelSerializer):

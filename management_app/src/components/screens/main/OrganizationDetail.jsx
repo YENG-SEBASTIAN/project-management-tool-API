@@ -16,10 +16,10 @@ const OrganizationDetail = () => {
   const { organization, loading, error } = useSelector(state => state.organizations);
   const user = JSON.parse(localStorage.getItem('user'));
 
-
   const [showConfirmModal, setShowConfirmModal] = useState(false);
   const [showUpdateModal, setShowUpdateModal] = useState(false);
   const [showAddMemberModal, setShowAddMemberModal] = useState(false);
+  const [memberToDelete, setMemberToDelete] = useState(null);
 
   useEffect(() => {
     dispatch(getOrganizationById(id));
@@ -35,6 +35,21 @@ const OrganizationDetail = () => {
     await dispatch(patchOrganization(id, updatedData));
     setShowAddMemberModal(false);
     dispatch(getOrganizationById(id)); // Refresh the organization details
+  };
+
+  const handleMemberDelete = (email) => {
+    setMemberToDelete(email);
+    setShowConfirmModal(true);
+  };
+
+  const confirmDeleteMember = async () => {
+    if (memberToDelete) {
+      const updatedMembers = organization.members_display.filter(member => member !== memberToDelete);
+      const updatedData = { members: updatedMembers };
+      await dispatch(patchOrganization(id, updatedData));
+      setShowConfirmModal(false);
+      dispatch(getOrganizationById(id)); // Refresh the organization details
+    }
   };
 
   if (loading) {
@@ -54,20 +69,19 @@ const OrganizationDetail = () => {
       <div className="flex justify-between items-center">
         <h1 className="text-2xl font-bold mb-4">Org. Name: {organization.name}</h1>
         {organization.owner === user.id ? 
-                <div className="flex space-x-2">
-                <button className="text-red-500" onClick={() => setShowConfirmModal(true)}>
-                  <AiOutlineDelete size={24} />
-                </button>
-                <button className="text-blue-500" onClick={() => setShowUpdateModal(true)}>
-                  <AiOutlineEdit size={24} />
-                </button>
-                <button className="text-green-500" onClick={() => setShowAddMemberModal(true)}>
-                  <AiOutlineUserAdd size={24} />
-                </button>
-              </div>
-              : ""
+          <div className="flex space-x-2">
+            <button className="text-red-500" onClick={() => setShowConfirmModal(true)}>
+              <AiOutlineDelete size={24} />
+            </button>
+            <button className="text-blue-500" onClick={() => setShowUpdateModal(true)}>
+              <AiOutlineEdit size={24} />
+            </button>
+            <button className="text-green-500" onClick={() => setShowAddMemberModal(true)}>
+              <AiOutlineUserAdd size={24} />
+            </button>
+          </div>
+          : ""
         }
-
       </div>
       <p className="text-lg">Description: {organization.description}</p>
       <h2 className="mt-4 text-xl font-bold">Members</h2>
@@ -75,12 +89,20 @@ const OrganizationDetail = () => {
         <thead>
           <tr>
             <th className="py-2 px-4 border-b">Email</th>
+            {organization.owner === user.id && <th className="py-2 px-4 border-b">Actions</th>}
           </tr>
         </thead>
         <tbody>
           {organization.members_display && organization.members_display.map((email, index) => (
             <tr key={index}>
               <td className="py-2 px-4 border-b">{email}</td>
+              {organization.owner === user.id &&
+                <td className="py-2 px-4 border-b">
+                  <button className="text-red-500" onClick={() => handleMemberDelete(email)}>
+                    <AiOutlineDelete size={20} />
+                  </button>
+                </td>
+              }
             </tr>
           ))}
         </tbody>
@@ -89,9 +111,9 @@ const OrganizationDetail = () => {
       {showConfirmModal && (
         <ConfirmModal
           onClose={() => setShowConfirmModal(false)}
-          onConfirm={handleDelete}
+          onConfirm={confirmDeleteMember}
           title="Confirm Deletion"
-          message="Are you sure you want to delete this organization?"
+          message={`Are you sure you want to remove ${memberToDelete} from this organization?`}
           submitName="Delete"
         />
       )}
