@@ -6,6 +6,7 @@ import projectReducer from './projectReducers';
 import organizationReducer from './organizationReducers';
 import milestonesReducer from './milestoneReducers';
 import tasksReducer from './taskReducers';
+import { analyticsReducer } from './analysticsReducers';
 
 const rootReducer = combineReducers({
   auth: authenticationReducer,
@@ -13,6 +14,7 @@ const rootReducer = combineReducers({
   organizations: organizationReducer,
   milestones: milestonesReducer,
   tasks: tasksReducer,
+  analytics: analyticsReducer,
 });
 
 export default rootReducer;
