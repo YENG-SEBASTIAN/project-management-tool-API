@@ -184,17 +184,19 @@ class TaskDetailView(generics.RetrieveUpdateDestroyAPIView):
             if not organization.members.filter(id=assignee.id).exists():
                 return Response({'error': 'Assignee is not a member of the organization'}, status=status.HTTP_400_BAD_REQUEST)
 
-        serializer.save(assignee=assignee)
+        try:
+            serializer.save(assignee=assignee)
+        except Exception as e:
+            return Response({'error': str(e)}, status=status.HTTP_400_BAD_REQUEST)
 
     def get_object(self):
         queryset = self.filter_queryset(self.get_queryset())
-        obj = queryset.get(pk=self.kwargs['pk'])
+        obj = get_object_or_404(queryset, pk=self.kwargs['pk'])
 
         # Check object permissions against request user
         self.check_object_permissions(self.request, obj)
 
         return obj
-    
     
 
 class TaskCommentListCreateView(generics.ListCreateAPIView):
