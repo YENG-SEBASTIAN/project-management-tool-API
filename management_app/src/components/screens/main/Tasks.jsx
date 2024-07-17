@@ -1,5 +1,6 @@
 import React, { useEffect, useState } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
+import { useNavigate } from 'react-router-dom';
 import { FiPlus } from 'react-icons/fi';
 import { AiOutlineSearch } from 'react-icons/ai';
 import { listTasks, createTask } from '../../../actions/taskActions';
@@ -11,6 +12,8 @@ import ItemList from '../../common/ItemList';
 
 const Tasks = () => {
   const dispatch = useDispatch();
+  const navigate = useNavigate();
+
   const { tasks, loading: tasksLoading, error: tasksError } = useSelector(state => state.tasks.taskList);
   const { milestones } = useSelector(state => state.milestones.milestoneList);
 
@@ -76,6 +79,10 @@ const Tasks = () => {
     return Array.from(assigneeEmails);
   };
 
+  const handleTaskClick = (id) => {
+    navigate(`/dashboard/tasks/${id}`);
+  };
+
   return (
     <div className="p-4">
       {tasksError && <Alert message={tasksError} type="error" />}
@@ -102,7 +109,7 @@ const Tasks = () => {
       ) : (
         <ItemList
           items={tasks}
-          onItemClick={() => {}}
+          onItemClick={(id) => handleTaskClick(id)}
           emptyMessage="No Tasks available."
           itemKey="id"
           itemTitle="name"
@@ -206,10 +213,14 @@ const Tasks = () => {
                 {formErrors.file && <p className="text-red-500 text-sm">{formErrors.file}</p>}
               </div>
               <div className="flex justify-end">
-                <button type="button" onClick={() => setIsAddModalOpen(false)} className="mr-4 py-2 px-4 bg-gray-500 text-white rounded">
+                <button
+                  type="button"
+                  className="bg-gray-400 text-white py-2 px-4 rounded mr-2"
+                  onClick={() => setIsAddModalOpen(false)}
+                >
                   Cancel
                 </button>
-                <button type="submit" className="py-2 px-4 bg-orange-600 text-white rounded">
+                <button type="submit" className="bg-orange-600 text-white py-2 px-4 rounded">
                   Add Task
                 </button>
               </div>

@@ -154,8 +154,12 @@ class TaskListCreateView(generics.ListCreateAPIView):
             print(f'Assignee ID: {assignee.id}')
 
         # Save the task with the assignee if needed
-        serializer.save(assignee=assignee)
+        task = serializer.save(assignee=assignee)
 
+        # Send an email to the assignee
+        send_task_assignment_email(task)
+        
+        
     def get_queryset(self):
         """
         Get tasks where the user is the assignee or a member of the milestone's project's organization.
@@ -173,7 +177,7 @@ class TaskDetailView(generics.RetrieveUpdateDestroyAPIView):
     permission_classes = [permissions.IsAuthenticated, IsTaskAssigneeOrMember]
 
     def perform_update(self, serializer):
-        assignee_email = self.request.data.get('assignee')
+        assignee_email = serializer.validated_data.pop('assignee_email', None)
         assignee = None
 
         if assignee_email:
@@ -185,7 +189,9 @@ class TaskDetailView(generics.RetrieveUpdateDestroyAPIView):
                 return Response({'error': 'Assignee is not a member of the organization'}, status=status.HTTP_400_BAD_REQUEST)
 
         try:
-            serializer.save(assignee=assignee)
+            task = serializer.save(assignee=assignee)
+            # Send an email to the assignee
+            send_task_assignment_email(task)
         except Exception as e:
             return Response({'error': str(e)}, status=status.HTTP_400_BAD_REQUEST)
 
