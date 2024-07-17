@@ -14,6 +14,8 @@ const OrganizationDetail = () => {
   const dispatch = useDispatch();
   const navigate = useNavigate();
   const { organization, loading, error } = useSelector(state => state.organizations);
+  const user = JSON.parse(localStorage.getItem('user'));
+
 
   const [showConfirmModal, setShowConfirmModal] = useState(false);
   const [showUpdateModal, setShowUpdateModal] = useState(false);
@@ -51,17 +53,21 @@ const OrganizationDetail = () => {
     <div className="p-4">
       <div className="flex justify-between items-center">
         <h1 className="text-2xl font-bold mb-4">Org. Name: {organization.name}</h1>
-        <div className="flex space-x-2">
-          <button className="text-red-500" onClick={() => setShowConfirmModal(true)}>
-            <AiOutlineDelete size={24} />
-          </button>
-          <button className="text-blue-500" onClick={() => setShowUpdateModal(true)}>
-            <AiOutlineEdit size={24} />
-          </button>
-          <button className="text-green-500" onClick={() => setShowAddMemberModal(true)}>
-            <AiOutlineUserAdd size={24} />
-          </button>
-        </div>
+        {organization.owner === user.id ? 
+                <div className="flex space-x-2">
+                <button className="text-red-500" onClick={() => setShowConfirmModal(true)}>
+                  <AiOutlineDelete size={24} />
+                </button>
+                <button className="text-blue-500" onClick={() => setShowUpdateModal(true)}>
+                  <AiOutlineEdit size={24} />
+                </button>
+                <button className="text-green-500" onClick={() => setShowAddMemberModal(true)}>
+                  <AiOutlineUserAdd size={24} />
+                </button>
+              </div>
+              : ""
+        }
+
       </div>
       <p className="text-lg">Description: {organization.description}</p>
       <h2 className="mt-4 text-xl font-bold">Members</h2>
