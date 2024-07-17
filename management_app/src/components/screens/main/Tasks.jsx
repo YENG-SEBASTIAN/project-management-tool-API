@@ -39,7 +39,7 @@ const Tasks = () => {
     formData.append('name', taskName);
     formData.append('description', taskDescription);
     formData.append('milestone', taskMilestone);
-    formData.append('assignee', taskAssignee);
+    formData.append('assignee_email', taskAssignee); // Use 'assignee_email' field
     formData.append('start_date', taskStartDate);
     formData.append('due_date', taskDueDate);
     if (taskFile) {
