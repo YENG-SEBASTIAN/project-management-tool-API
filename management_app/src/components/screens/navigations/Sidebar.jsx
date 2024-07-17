@@ -1,6 +1,6 @@
 import React from 'react';
 import { Link } from 'react-router-dom';
-import { FiClipboard, FiFlag, FiCheckSquare, FiBriefcase } from 'react-icons/fi';
+import { FiClipboard, FiFlag, FiCheckSquare, FiBriefcase, FiBarChart } from 'react-icons/fi';
 
 const Sidebar = ({ isOpen }) => {
   return (
@@ -11,6 +11,11 @@ const Sidebar = ({ isOpen }) => {
       <div className="flex flex-col mt-5 justify-between flex-1">
         <div className="p-4">
           <ul>
+          <li>
+              <Link to="/dashboard/organizations" className="flex items-center py-2">
+                <FiBriefcase className="mr-2" /> Organizations
+              </Link>
+            </li>
             <li>
               <Link to="/dashboard/projects" className="flex items-center py-2">
                 <FiClipboard className="mr-2" /> Projects
@@ -27,8 +32,8 @@ const Sidebar = ({ isOpen }) => {
               </Link>
             </li>
             <li>
-              <Link to="/dashboard/organizations" className="flex items-center py-2">
-                <FiBriefcase className="mr-2" /> Organizations
+              <Link to="/dashboard/progress" className="flex items-center py-2">
+                <FiBarChart className="mr-2" /> Progress
               </Link>
             </li>
           </ul>
