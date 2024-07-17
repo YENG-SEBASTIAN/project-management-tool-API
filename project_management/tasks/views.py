@@ -233,3 +233,23 @@ class MilestoneListWithTasksView(generics.ListAPIView):
             models.Q(project__owner=self.request.user) |
             models.Q(project__organization__members__id=self.request.user.id)
         ).distinct()
+        
+        
+@api_view(['GET'])
+def milestone_task_progress(request, milestone_id):
+    try:
+        milestone = Milestone.objects.get(id=milestone_id)
+        tasks = milestone.tasks.all()
+        total_tasks = tasks.count()
+        completed_tasks = tasks.filter(completed=True).count()
+        progress = (completed_tasks / total_tasks) * 100 if total_tasks > 0 else 0
+
+        data = {
+            'total_tasks': total_tasks,
+            'completed_tasks': completed_tasks,
+            'progress': progress
+        }
+
+        return Response(data, status=status.HTTP_200_OK)
+    except Milestone.DoesNotExist:
+        return Response({'error': 'Milestone not found'}, status=status.HTTP_404_NOT_FOUND)
