@@ -1,5 +1,6 @@
 from rest_framework import generics, permissions, status
 from rest_framework.response import Response
+from rest_framework.decorators import api_view
 from django.shortcuts import get_object_or_404
 from django.db import models
 from django.db.models import Q
@@ -214,3 +215,21 @@ class TaskCommentDetailView(generics.RetrieveUpdateDestroyAPIView):
     queryset = TaskComment.objects.all()
     serializer_class = TaskCommentSerializer
     permission_classes = [permissions.IsAuthenticated, IsTaskAssigneeOrMember]
+
+
+
+# =================== ANALYSTICS VIEWSS ============================
+
+class MilestoneListWithTasksView(generics.ListAPIView):
+    queryset = Milestone.objects.all()
+    serializer_class = MilestoneSerializer
+    permission_classes = [permissions.IsAuthenticated]
+
+    def get_queryset(self):
+        """
+        Get milestones where the user is the owner of the project or a member of the organization.
+        """
+        return Milestone.objects.filter(
+            models.Q(project__owner=self.request.user) |
+            models.Q(project__organization__members__id=self.request.user.id)
+        ).distinct()

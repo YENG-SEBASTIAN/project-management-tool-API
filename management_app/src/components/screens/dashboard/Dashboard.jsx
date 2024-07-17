@@ -9,6 +9,7 @@ import Tasks from "../main/Tasks";
 import TaskDetail from "../main/TaskDetail";
 import Organization from "../main/Organization";
 import OrganizationDetail from "../main/OrganizationDetail";
+import Progress from "../main/Progress";
 import ProtectedRoute from "../../auth/ProtectedRoute";
 
 const Dashboard = () => {
@@ -82,6 +83,14 @@ const Dashboard = () => {
               element={
                 <ProtectedRoute>
                   <OrganizationDetail />
+                </ProtectedRoute>
+              }
+            />
+              <Route
+              path="/progress"
+              element={
+                <ProtectedRoute>
+                  <Progress />
                 </ProtectedRoute>
               }
             />

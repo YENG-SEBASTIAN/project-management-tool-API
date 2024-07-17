@@ -4,7 +4,8 @@ from tasks.views import (
     ProjectListCreateView, ProjectDetailView,
     MilestoneListCreateView, MilestoneDetailView,
     TaskListCreateView, TaskDetailView,
-    TaskCommentListCreateView, TaskCommentDetailView
+    TaskCommentListCreateView, TaskCommentDetailView,
+    MilestoneListWithTasksView
 )
 
 urlpatterns = [
@@ -18,4 +19,7 @@ urlpatterns = [
     path('tasks/<str:pk>/', TaskDetailView.as_view(), name='task-detail'),
     path('task-comments/', TaskCommentListCreateView.as_view(), name='task-comment-list-create'),
     path('task-comments/<str:pk>/', TaskCommentDetailView.as_view(), name='task-comment-detail'),
+    path('analystics/', MilestoneListWithTasksView.as_view(), name='milestone-list-with-tasks'),
+    # path('milestones/<str:milestone_id>/progress/', milestone_task_progress, name='milestone-task-progress'),
+
 ]

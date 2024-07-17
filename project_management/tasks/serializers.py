@@ -96,11 +96,10 @@ class TaskSerializer(serializers.ModelSerializer):
     milestone_details = MilestoneSerializer(source='milestone', read_only=True)
     assignee_email = serializers.CharField(write_only=True, required=False)
     assignee = serializers.PrimaryKeyRelatedField(read_only=True)
-    users = CustomUserSerializer(source='user', read_only=True)
 
     class Meta:
         model = Task
-        fields = ['id', 'name', 'description', 'file', 'start_date', 'due_date', 'milestone', 'milestone_details', 'assignee_email', 'assignee', 'users', 'completed', 'created_at', 'updated_at']
+        fields = ['id', 'name', 'description', 'file', 'start_date', 'due_date', 'milestone', 'milestone_details', 'assignee_email', 'assignee', 'completed', 'created_at', 'updated_at']
         
         
 class TaskCommentSerializer(serializers.ModelSerializer):
