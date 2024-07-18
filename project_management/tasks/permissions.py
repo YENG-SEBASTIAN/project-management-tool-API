@@ -54,3 +54,21 @@ class IsMilestoneOwnerOrOrganizationMember(permissions.BasePermission):
                 project = Project.objects.get(id=project_id)
                 return project.owner == request.user
         return True
+
+
+class IsTaskOwner(permissions.BasePermission):
+    """
+    Permission check to ensure only the owner can add, update, or delete tasks.
+    """
+    def has_object_permission(self, request, view, obj):
+        # Check if the user is the owner of the project
+        return obj.milestone.project.owner == request.user
+
+    def has_permission(self, request, view):
+        # Allow creation of tasks only if the user is the owner of the project
+        if request.method == 'POST':
+            project_id = request.data.get('project')
+            if project_id:
+                project = Project.objects.get(id=project_id)
+                return project.owner == request.user
+        return True

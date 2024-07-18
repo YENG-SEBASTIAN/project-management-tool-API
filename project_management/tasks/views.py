@@ -7,7 +7,7 @@ from django.db.models import Q
 from accounts.models import User
 from tasks.models import Project, Milestone, Task, TaskComment, Organization
 from tasks.serializers import ProjectSerializer, MilestoneSerializer, TaskSerializer, TaskCommentSerializer, OrganizationSerializer
-from tasks.permissions import IsOrganizationMemberOrOwner, IsTaskAssigneeOrMember, IsMilestoneOwnerOrOrganizationMember
+from tasks.permissions import IsOrganizationMemberOrOwner, IsTaskAssigneeOrMember, IsMilestoneOwnerOrOrganizationMember, IsTaskOwner
 from tasks.utils import send_task_assignment_email
 
 class OrganizationListCreateView(generics.ListCreateAPIView):
@@ -131,10 +131,12 @@ class MilestoneDetailView(generics.RetrieveUpdateDestroyAPIView):
             return [IsMilestoneOwnerOrOrganizationMember()]
         return super().get_permissions()
     
+    
+    
 class TaskListCreateView(generics.ListCreateAPIView):
     queryset = Task.objects.all()
     serializer_class = TaskSerializer
-    permission_classes = [permissions.IsAuthenticated]
+    permission_classes = [permissions.IsAuthenticated, IsOrganizationMemberOrOwner, IsTaskOwner]
 
     def perform_create(self, serializer):
         assignee_email = serializer.validated_data.pop('assignee_email', None)
@@ -151,31 +153,26 @@ class TaskListCreateView(generics.ListCreateAPIView):
             if not organization.members.filter(id=assignee.id).exists():
                 return Response({'error': 'Assignee is not a member of the organization'}, status=status.HTTP_400_BAD_REQUEST)
 
-            # Print the assignee's ID if they are found and are a member of the organization
-            print(f'Assignee ID: {assignee.id}')
-
         # Save the task with the assignee if needed
         task = serializer.save(assignee=assignee)
 
         # Send an email to the assignee
         send_task_assignment_email(task)
-        
-        
+
     def get_queryset(self):
         """
         Get tasks where the user is the assignee or a member of the milestone's project's organization.
         """
         return Task.objects.filter(
             Q(assignee=self.request.user) |
-            Q(milestone__project__organization__members=self.request.user)
+            Q(milestone__project__organization__members=self.request.user) |
+            Q(milestone__project__organization__owner=self.request.user)
         ).distinct()
-
-
 
 class TaskDetailView(generics.RetrieveUpdateDestroyAPIView):
     queryset = Task.objects.all()
     serializer_class = TaskSerializer
-    permission_classes = [permissions.IsAuthenticated, IsTaskAssigneeOrMember]
+    permission_classes = [permissions.IsAuthenticated, IsTaskOwner]
 
     def perform_update(self, serializer):
         assignee_email = serializer.validated_data.pop('assignee_email', None)
@@ -204,7 +201,6 @@ class TaskDetailView(generics.RetrieveUpdateDestroyAPIView):
         self.check_object_permissions(self.request, obj)
 
         return obj
-    
 
 class TaskCommentListCreateView(generics.ListCreateAPIView):
     queryset = TaskComment.objects.all()

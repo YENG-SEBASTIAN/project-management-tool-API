@@ -167,11 +167,11 @@ const Milestone = () => {
           {successMessage && <Alert message={successMessage} type="success" />}
           {errorMessage && <Alert message={errorMessage} type="error" />}
 
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+          <div className="grid bg-white grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
             {milestones.map((milestone) => (
               <div
                 key={milestone.id}
-                className="bg-white p-4 rounded shadow"
+                className="bg-orange-300 p-4 rounded shadow"
                 onClick={() => {
                   setSelectedMilestone(milestone);
                   openUpdateModal();
