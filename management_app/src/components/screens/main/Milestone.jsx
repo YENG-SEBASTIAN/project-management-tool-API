@@ -188,7 +188,7 @@ const Milestone = () => {
                 <p className="text-gray-600 text-sm mb-2">
                   Project: {milestone.project.name}
                 </p>
-                {user && user.id && (
+                {milestone.project.owner === user.id ? (
                   <div className="flex justify-end space-x-2 mt-4">
                     <button
                       className="flex items-center bg-blue-500 text-white px-4 py-2 rounded hover:bg-blue-600"
@@ -210,7 +210,8 @@ const Milestone = () => {
                       <FiTrash2 className="mr-2" />
                     </button>
                   </div>
-                )}
+                ): ""
+              }
               </div>
             ))}
           </div>
@@ -233,7 +234,7 @@ const Milestone = () => {
             />
           )}
 
-          {isUpdateModalOpen && selectedMilestone && (
+          {/* {isUpdateModalOpen && selectedMilestone && (
             <UpdateMilestoneModal
               onClose={closeUpdateModal}
               onSubmit={handleUpdateMilestone}
@@ -249,7 +250,7 @@ const Milestone = () => {
               setProject={setProject}
               projects={projects}
             />
-          )}
+          )} */}
 
           {isConfirmModalOpen && (
             <ConfirmModal

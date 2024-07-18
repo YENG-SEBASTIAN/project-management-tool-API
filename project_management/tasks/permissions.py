@@ -62,7 +62,15 @@ class IsTaskOwner(permissions.BasePermission):
     """
     def has_object_permission(self, request, view, obj):
         # Check if the user is the owner of the project
-        return obj.milestone.project.owner == request.user
+        if obj.milestone.project.owner == request.user:
+            return True
+        
+        # Check if the user is a member of the organization related to the project
+        if obj.milestone.project.organization.members.filter(id=request.user.id).exists():
+            # Allow only GET (view) permissions for organization members
+            return request.method in permissions.SAFE_METHODS  # GET, HEAD, OPTIONS
+
+        return False
 
     def has_permission(self, request, view):
         # Allow creation of tasks only if the user is the owner of the project

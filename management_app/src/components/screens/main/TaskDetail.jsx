@@ -72,7 +72,7 @@ const TaskDetail = () => {
                 rel="noopener noreferrer"
                 className="text-orange-600 underline"
               >
-                Download File
+                View File
               </a>
             </div>
           )}
