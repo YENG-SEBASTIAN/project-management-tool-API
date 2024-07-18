@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import { useParams } from 'react-router-dom';
-import { getTaskDetails, updateTaskPartial } from '../../../actions/taskActions';
+import { getTaskDetails, updateTaskPartial, updateTask, deleteTask } from '../../../actions/taskActions';
 import Spinner from '../../common/Spinner';
 import Alert from '../../common/Alert';
 import Modal from '../../common/Modal';
@@ -10,10 +10,15 @@ const TaskDetail = () => {
   const dispatch = useDispatch();
   const { id } = useParams();
 
-  const [isModalOpen, setIsModalOpen] = useState(false);
+  const [isCompleteModalOpen, setIsCompleteModalOpen] = useState(false);
+  const [isEditModalOpen, setIsEditModalOpen] = useState(false);
+  const [isDeleteModalOpen, setIsDeleteModalOpen] = useState(false);
+  const [taskDetails, setTaskDetails] = useState({});
   const [completed, setCompleted] = useState(false);
+  const [successMessage, setSuccessMessage] = useState('');
 
   const { task, loading, error } = useSelector(state => state.tasks.taskDetails);
+  const user = JSON.parse(localStorage.getItem('user'));
 
   useEffect(() => {
     dispatch(getTaskDetails(id));
@@ -22,21 +27,47 @@ const TaskDetail = () => {
   useEffect(() => {
     if (task) {
       setCompleted(task.completed);
+      setTaskDetails(task);
     }
   }, [task]);
 
-  const handleSubmit = () => {
-    dispatch(updateTaskPartial(id, { completed }));
-    setIsModalOpen(false);
+  const handleUpdate = () => {
+    dispatch(updateTask(id, taskDetails));
+    setIsEditModalOpen(false);
   };
 
-  const assigneeEmail = task?.milestone_details?.project?.organization_detail?.members_display?.find(
-    member => member.id === task.assignee_id
-  )?.email;
+  const handleComplete = () => {
+    dispatch(updateTaskPartial(id, { completed }))
+      .then(() => {
+        setSuccessMessage('Task marked as completed successfully!');
+        setIsCompleteModalOpen(false);
+        setTimeout(() => {
+          setSuccessMessage('');
+        }, 5000);
+      })
+      .catch((err) => {
+        console.error(err);
+        setSuccessMessage('Failed to mark the task as completed.');
+        setTimeout(() => {
+          setSuccessMessage('');
+        }, 5000);
+      });
+  };
+
+  const handleDelete = () => {
+    dispatch(deleteTask(id));
+    setIsDeleteModalOpen(false);
+    window.history.back();
+  };
+
+  // Safely access nested properties
+  const assigneeEmail = task?.milestone_details?.name || '';
+  const projectOwner = task?.milestone_details?.project?.organization_detail?.owner || '';
 
   return (
     <div className="p-4 max-w-4xl mx-auto">
       {error && <Alert message={error} type="error" />}
+      {successMessage && <Alert message={successMessage} type="success" />}
       {loading ? (
         <Spinner />
       ) : task ? (
@@ -84,12 +115,33 @@ const TaskDetail = () => {
             >
               Back to Tasks
             </button>
-            <button
-              className="bg-green-600 text-white py-2 px-4 rounded"
-              onClick={() => setIsModalOpen(true)}
-            >
-              Mark as Completed
-            </button>
+            {task.assignee === user.id && !completed && (
+              <button
+                className="bg-green-600 text-white py-2 px-4 rounded"
+                onClick={() => setIsCompleteModalOpen(true)}
+              >
+                Mark as Completed
+              </button>
+            )}
+            {task.completed && (
+              <p className="text-green-600 font-bold">This task has been completed successfully.</p>
+            )}
+            {projectOwner === user.id && (
+              <>
+                <button
+                  className="bg-blue-600 text-white py-2 px-4 rounded"
+                  onClick={() => setIsEditModalOpen(true)}
+                >
+                  Edit Task
+                </button>
+                <button
+                  className="bg-red-600 text-white py-2 px-4 rounded"
+                  onClick={() => setIsDeleteModalOpen(true)}
+                >
+                  Delete Task
+                </button>
+              </>
+            )}
           </div>
         </div>
       ) : (
@@ -98,9 +150,9 @@ const TaskDetail = () => {
         </div>
       )}
 
-      {isModalOpen && (
-        <Modal onClose={() => setIsModalOpen(false)}>
-          <h2 className="text-xl font-semibold mb-4">Submit to complete Tasks</h2>
+      {isCompleteModalOpen && (
+        <Modal onClose={() => setIsCompleteModalOpen(false)}>
+          <h2 className="text-xl font-semibold mb-4">Submit to complete Task</h2>
           <div className="mb-4">
             <label className="block text-gray-700">Completed</label>
             <input
@@ -113,13 +165,71 @@ const TaskDetail = () => {
           <div className="mt-6 flex space-x-4">
             <button
               className="bg-green-600 text-white py-2 px-4 rounded"
-              onClick={handleSubmit}
+              onClick={handleComplete}
             >
               Submit
             </button>
             <button
               className="bg-gray-600 text-white py-2 px-4 rounded"
-              onClick={() => setIsModalOpen(false)}
+              onClick={() => setIsCompleteModalOpen(false)}
+            >
+              Cancel
+            </button>
+          </div>
+        </Modal>
+      )}
+
+      {isEditModalOpen && (
+        <Modal onClose={() => setIsEditModalOpen(false)}>
+          <h2 className="text-xl font-semibold mb-4">Edit Task</h2>
+          <div className="mb-4">
+            <label className="block text-gray-700">Name</label>
+            <input
+              type="text"
+              value={taskDetails.name}
+              onChange={(e) => setTaskDetails({ ...taskDetails, name: e.target.value })}
+              className="mt-1"
+            />
+          </div>
+          <div className="mb-4">
+            <label className="block text-gray-700">Description</label>
+            <textarea
+              value={taskDetails.description}
+              onChange={(e) => setTaskDetails({ ...taskDetails, description: e.target.value })}
+              className="mt-1"
+            />
+          </div>
+          <div className="mt-6 flex space-x-4">
+            <button
+              className="bg-blue-600 text-white py-2 px-4 rounded"
+              onClick={handleUpdate}
+            >
+              Update
+            </button>
+            <button
+              className="bg-gray-600 text-white py-2 px-4 rounded"
+              onClick={() => setIsEditModalOpen(false)}
+            >
+              Cancel
+            </button>
+          </div>
+        </Modal>
+      )}
+
+      {isDeleteModalOpen && (
+        <Modal onClose={() => setIsDeleteModalOpen(false)}>
+          <h2 className="text-xl font-semibold mb-4">Confirm Delete</h2>
+          <p>Are you sure you want to delete this task?</p>
+          <div className="mt-6 flex space-x-4">
+            <button
+              className="bg-red-600 text-white py-2 px-4 rounded"
+              onClick={handleDelete}
+            >
+              Delete
+            </button>
+            <button
+              className="bg-gray-600 text-white py-2 px-4 rounded"
+              onClick={() => setIsDeleteModalOpen(false)}
             >
               Cancel
             </button>
