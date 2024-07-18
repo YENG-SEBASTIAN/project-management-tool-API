@@ -6,7 +6,9 @@ import projectReducer from './projectReducers';
 import organizationReducer from './organizationReducers';
 import milestonesReducer from './milestoneReducers';
 import tasksReducer from './taskReducers';
-import { analyticsReducer } from './analysticsReducers';
+import { analyticsReducer } from './analyticsReducers';
+
+
 
 const rootReducer = combineReducers({
   auth: authenticationReducer,

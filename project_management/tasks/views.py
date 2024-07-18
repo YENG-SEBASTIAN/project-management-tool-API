@@ -239,7 +239,7 @@ class MilestoneListWithTasksView(generics.ListAPIView):
 def milestone_task_progress(request, milestone_id):
     try:
         milestone = Milestone.objects.get(id=milestone_id)
-        tasks = milestone.tasks.all()
+        tasks = Task.objects.filter(milestone=milestone)
         total_tasks = tasks.count()
         completed_tasks = tasks.filter(completed=True).count()
         progress = (completed_tasks / total_tasks) * 100 if total_tasks > 0 else 0
@@ -247,7 +247,19 @@ def milestone_task_progress(request, milestone_id):
         data = {
             'total_tasks': total_tasks,
             'completed_tasks': completed_tasks,
-            'progress': progress
+            'progress': progress,
+            'tasks': [
+                {
+                    'id': task.id,
+                    'name': task.name,
+                    'description': task.description,
+                    'file': task.file.url if task.file else None,
+                    'start_date': task.start_date,
+                    'due_date': task.due_date,
+                    'assignee': task.assignee.username if task.assignee else None,
+                    'completed': task.completed
+                } for task in tasks
+            ]
         }
 
         return Response(data, status=status.HTTP_200_OK)

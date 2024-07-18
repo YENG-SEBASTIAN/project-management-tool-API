@@ -10,6 +10,7 @@ import TaskDetail from "../main/TaskDetail";
 import Organization from "../main/Organization";
 import OrganizationDetail from "../main/OrganizationDetail";
 import Progress from "../main/Progress";
+import MilestoneProgrssDetail from "../main/MilestoneProgressDetail";
 import ProtectedRoute from "../../auth/ProtectedRoute";
 
 const Dashboard = () => {
@@ -91,6 +92,14 @@ const Dashboard = () => {
               element={
                 <ProtectedRoute>
                   <Progress />
+                </ProtectedRoute>
+              }
+            />
+                    <Route
+              path="/milestonesprogress/:id"
+              element={
+                <ProtectedRoute>
+                  <MilestoneProgrssDetail />
                 </ProtectedRoute>
               }
             />

@@ -1,9 +1,8 @@
-
-
+// components/Progress.jsx
 import React, { useEffect } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
-import { fetchMilestones, fetchTaskProgress } from '../../../actions/analysticsActions';
-import { Doughnut } from 'react-chartjs-2';
+import { Link } from 'react-router-dom';
+import { fetchMilestones } from '../../../actions/analyticsActions';
 
 const Progress = () => {
   const dispatch = useDispatch();
@@ -13,65 +12,24 @@ const Progress = () => {
     dispatch(fetchMilestones());
   }, [dispatch]);
 
-  if (loadingMilestones) return <p>Loading milestones...</p>;
-  if (errorMilestones) return <p>Error: {errorMilestones}</p>;
+  if (loadingMilestones) return <p className="text-center text-gray-500">Loading milestones...</p>;
+  if (errorMilestones) return <p className="text-center text-red-500">Error: {errorMilestones}</p>;
 
   return (
-    <div>
-      <h1>Milestones</h1>
-      <ul>
+    <div className="container mx-auto px-4 py-6">
+      <h1 className="text-3xl font-bold mb-6 text-center">Milestones & Tasks</h1>
+      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
         {milestones.map(milestone => (
-          <li key={milestone.id}>
-            <Milestone milestone={milestone} />
-          </li>
-        ))}
-      </ul>
-    </div>
-  );
-};
-
-const Milestone = ({ milestone }) => {
-  const dispatch = useDispatch();
-  const { taskProgress, loadingTaskProgress, errorTaskProgress } = useSelector(state => state.analytics);
-
-  const fetchTasks = () => {
-    dispatch(fetchTaskProgress(milestone.id));
-  };
-
-  const progressData = taskProgress[milestone.id] || { total_tasks: 0, completed_tasks: 0, progress: 0 };
-
-  const data = {
-    labels: ['Completed', 'Incomplete'],
-    datasets: [
-      {
-        data: [progressData.completed_tasks, progressData.total_tasks - progressData.completed_tasks],
-        backgroundColor: ['#36A2EB', '#FF6384'],
-      },
-    ],
-  };
-
-  return (
-    <div>
-      <h2>{milestone.name}</h2>
-      <button onClick={fetchTasks}>View Tasks and Progress</button>
-      {loadingTaskProgress && <p>Loading tasks...</p>}
-      {errorTaskProgress && <p>Error: {errorTaskProgress}</p>}
-      {!loadingTaskProgress && taskProgress[milestone.id] && (
-        <>
-          <ul>
-            {milestone.tasks.map(task => (
-              <li key={task.id}>{task.name}</li>
-            ))}
-          </ul>
-          <div>
-            <h3>Progress</h3>
-            <p>Total Tasks: {progressData.total_tasks}</p>
-            <p>Completed Tasks: {progressData.completed_tasks}</p>
-            <p>Progress: {progressData.progress}%</p>
-            <Doughnut data={data} />
+          <div key={milestone.id} className="bg-white shadow-md rounded-lg p-4">
+            <h2 className="text-xl font-semibold mb-2">{milestone.name}</h2>
+            <Link to={`/dashboard/milestonesprogress/${milestone.id}`}>
+              <button className="bg-blue-500 hover:bg-blue-600 text-white font-semibold py-2 px-4 rounded mb-4">
+                View Tasks and Progress
+              </button>
+            </Link>
           </div>
-        </>
-      )}
+        ))}
+      </div>
     </div>
   );
 };
