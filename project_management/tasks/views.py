@@ -10,6 +10,7 @@ from tasks.serializers import ProjectSerializer, MilestoneSerializer, TaskSerial
 from tasks.permissions import IsOrganizationMemberOrOwner, IsTaskAssigneeOrMember, IsMilestoneOwnerOrOrganizationMember, IsTaskOwner
 from tasks.utils import send_task_assignment_email
 
+
 class OrganizationListCreateView(generics.ListCreateAPIView):
     queryset = Organization.objects.all()
     serializer_class = OrganizationSerializer
@@ -23,8 +24,8 @@ class OrganizationListCreateView(generics.ListCreateAPIView):
         Get organizations where the user is the owner or a member.
         """
         return Organization.objects.filter(
-            models.Q(owner=self.request.user) |
-            models.Q(members__id=self.request.user.id)
+            Q(owner=self.request.user) |
+            Q(members__id=self.request.user.id)
         ).distinct()
 
 class OrganizationDetailView(generics.RetrieveUpdateDestroyAPIView):
@@ -33,15 +34,24 @@ class OrganizationDetailView(generics.RetrieveUpdateDestroyAPIView):
     permission_classes = [permissions.IsAuthenticated, IsOrganizationMemberOrOwner]
 
     def perform_update(self, serializer):
+        # Ensure only the owner can update the organization details
+        if self.get_object().owner != self.request.user:
+            raise permissions.PermissionDenied("You do not have permission to update this organization.")
         serializer.save()
+
+    def perform_destroy(self, instance):
+        # Ensure only the owner can delete the organization
+        if instance.owner != self.request.user:
+            raise permissions.PermissionDenied("You do not have permission to delete this organization.")
+        instance.delete()
 
     def get_queryset(self):
         """
         Get organizations where the user is the owner or a member.
         """
         return self.queryset.filter(
-            models.Q(owner=self.request.user) |
-            models.Q(members__id=self.request.user.id)
+            Q(owner=self.request.user) |
+            Q(members__id=self.request.user.id)
         ).distinct()
 
 class ProjectListCreateView(generics.ListCreateAPIView):
