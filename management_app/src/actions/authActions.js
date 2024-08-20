@@ -22,7 +22,7 @@ export const register = ({ email, username, password }) => async dispatch => {
   dispatch({ type: REGISTER_REQUEST });
 
   try {
-    const res = await axios.post(`${base_url}/accounts/register/`, { email, username, password });
+    const res = await axios.post(`${base_url}accounts/register/`, { email, username, password });
     dispatch({
       type: REGISTER_SUCCESS,
       payload: res.data
@@ -43,7 +43,7 @@ export const login = ({ email, password }) => async dispatch => {
   dispatch({ type: LOGIN_REQUEST });
 
   try {
-    const res = await axios.post(`${base_url}/accounts/login/`, { email, password });
+    const res = await axios.post(`${base_url}accounts/login/`, { email, password });
     dispatch({
       type: LOGIN_SUCCESS,
       payload: res.data  // Backend sends back user data and token
