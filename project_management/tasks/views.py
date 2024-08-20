@@ -182,7 +182,7 @@ class TaskListCreateView(generics.ListCreateAPIView):
 class TaskDetailView(generics.RetrieveUpdateDestroyAPIView):
     queryset = Task.objects.all()
     serializer_class = TaskSerializer
-    permission_classes = [permissions.IsAuthenticated, IsTaskOwner]
+    # permission_classes = [permissions.IsAuthenticated, IsTaskAssigneeOrMember, IsTaskOwner]
 
     def perform_update(self, serializer):
         assignee_email = serializer.validated_data.pop('assignee_email', None)

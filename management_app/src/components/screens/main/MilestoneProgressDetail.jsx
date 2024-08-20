@@ -36,23 +36,27 @@ const MilestoneProgressDetail = () => {
   return (
     <div className="container mx-auto px-4 py-6">
       <h1 className="text-3xl font-bold mb-6 text-center">Task Progress Details</h1>
-      <div className="bg-white shadow-md rounded-lg p-6">
-        <h2 className="text-2xl font-semibold mb-4">Tasks</h2>
-        <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-4 mb-6">
-          {tasks.map(task => (
-            <div key={task.id} className="bg-white p-4 rounded-lg shadow-md">
-              <p className="font-bold">{task.name}</p>
-              <p>Assignee: {task.assignee}</p>
-              <p>Completed: {task.completed ? 'Yes' : 'No'}</p>
-            </div>
-          ))}
-        </div>
-        <div>
+      <div className="bg-white shadow-md rounded-lg p-6 flex flex-col md:flex-row">
+        <div className="md:w-1/2 md:pr-4">
+          <h2 className="text-2xl font-semibold mb-4">Tasks</h2>
+          <div className="space-y-4 mb-6">
+            {tasks.map(task => (
+              <div key={task.id} className="bg-gray-100 p-4 rounded-lg shadow-md">
+                <p className="font-bold">{task.name}</p>
+                <p>Assignee: {task.assignee}</p>
+                <p>Completed: {task.completed ? 'Yes' : 'No'}</p>
+              </div>
+            ))}
+          </div>
           <h3 className="text-xl font-semibold mb-2">Progress</h3>
-          <p className="text-gray-700">Total Tasks: {progressData.total_tasks}</p>
-          <p className="text-gray-700">Completed Tasks: {progressData.completed_tasks}</p>
-          <p className="text-gray-700">Progress: {progressData.progress}%</p>
-          <div className="mt-4" style={{ maxWidth: '400px', margin: '0 auto' }}>
+          <div className="text-gray-700 space-y-1">
+            <p>Total Tasks: {progressData.total_tasks}</p>
+            <p>Completed Tasks: {progressData.completed_tasks}</p>
+            <p>Progress: {progressData.progress}%</p>
+          </div>
+        </div>
+        <div className="md:w-1/2 mt-6 md:mt-0 md:pl-4 flex justify-center items-center">
+          <div style={{ maxWidth: '300px', width: '100%' }}>
             <Doughnut data={data} />
           </div>
         </div>

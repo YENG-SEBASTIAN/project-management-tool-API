@@ -172,10 +172,6 @@ const Milestone = () => {
               <div
                 key={milestone.id}
                 className="bg-orange-300 p-4 rounded shadow"
-                onClick={() => {
-                  setSelectedMilestone(milestone);
-                  openUpdateModal();
-                }}
               >
                 <h2 className="text-lg font-bold mb-2">{milestone.name}</h2>
                 <p className="text-gray-700 mb-2">{milestone.description}</p>
@@ -234,7 +230,7 @@ const Milestone = () => {
             />
           )}
 
-          {/* {isUpdateModalOpen && selectedMilestone && (
+          {isUpdateModalOpen && selectedMilestone && (
             <UpdateMilestoneModal
               onClose={closeUpdateModal}
               onSubmit={handleUpdateMilestone}
@@ -250,7 +246,7 @@ const Milestone = () => {
               setProject={setProject}
               projects={projects}
             />
-          )} */}
+          )}
 
           {isConfirmModalOpen && (
             <ConfirmModal
