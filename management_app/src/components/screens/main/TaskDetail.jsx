@@ -126,7 +126,7 @@ const TaskDetail = () => {
             {task.completed && (
               <p className="text-green-600 font-bold">This task has been completed successfully.</p>
             )}
-            {projectOwner === user.id && (
+            {!task.completed && projectOwner === user.id && (
               <>
                 <button
                   className="bg-blue-600 text-white py-2 px-4 rounded"
